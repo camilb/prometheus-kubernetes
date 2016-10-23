@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager
+  namespace: monitoring
+data:
+  config.yml: |-
+    global:
+      slack_api_url: 'https://hooks.slack.com/services/your_token'
+      smtp_smarthost: 'your_smtp_host:587'
+      smtp_from: 'prometheus@yourdomain.com'
+      smtp_auth_username: 'your_smtp_username'
+      smtp_auth_password: 'smtp_pass'
+    templates:
+    - '/etc/alertmanager/template/*.tmpl'
+    route:
+      group_by: ['alertname', 'cluster', 'service']
+      group_wait: 30s
+      group_interval: 1m
+      repeat_interval: 1m
+      receiver: default-receiver
+    inhibit_rules:
+    - source_match:
+        severity: 'critical'
+      target_match:
+        severity: 'warning'
+      # Apply inhibition if the alertname is the same.
+      equal: ['alertname', 'cluster', 'service']
+    receivers:
+    - name: 'default-receiver'
+      slack_configs:
+      - channel: '#slack_channel'
+        text: '{{ .Alerts.Firing }}/{{ .GroupLabels.alertname }}/{{ .GroupLabels.SortedPairs.Values }}'
+        send_resolved: true
+      email_configs:
+      - to: 'alerts@yourdomain.com'
+        send_resolved: true

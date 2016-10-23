@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: 'true'
+  labels:
+    name: prometheus
+  name: prometheus
+  namespace: monitoring
+spec:
+  selector:
+    app: prometheus
+  type: ClusterIP
+  ports:
+  - name: prometheus
+    protocol: TCP
+    port: 9090
+    targetPort: 9090
+---
+apiVersion: apps/v1alpha1
+kind: PetSet
+metadata:
+  name: prometheus
+  namespace: monitoring
+spec:
+  serviceName: "prometheus"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: prometheus
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+    spec:
+      nodeSelector:
+        role: monitoring
+      terminationGracePeriodSeconds: 0
+      containers:
+      - name: prometheus-prom-1
+        image: prom/prometheus:v1.2.1
+        args:
+          - '-storage.local.retention=720h'
+          - '-storage.local.memory-chunks=500000'
+          - '-config.file=/etc/prometheus/prometheus.yml'
+          - '-alertmanager.url=http://alertmanager:9093'
+        ports:
+        - name: web
+          containerPort: 9090
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/prometheus
+        - name: prometheus-prom-1
+          mountPath: /prometheus
+      volumes:
+      - name: config-volume
+        configMap:
+          name: prometheus
+  volumeClaimTemplates:
+  - metadata:
+      name: prometheus-prom-1
+      annotations:
+        volume.alpha.kubernetes.io/storage-class: ebs
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 20Gi

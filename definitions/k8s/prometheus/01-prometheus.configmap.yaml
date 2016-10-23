@@ -1,0 +1,168 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus
+  namespace: monitoring
+data:
+  prometheus.yml: |-
+    global:
+      scrape_interval: 10s
+    scrape_configs:
+    - job_name: 'kubernetes-cluster'
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        insecure_skip_verify: true
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      kubernetes_sd_configs:
+      - api_servers:
+        - 'https://kubernetes.default.svc'
+        in_cluster: true
+        role: apiserver
+    - job_name: 'kubernetes-nodes'
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        insecure_skip_verify: true
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      kubernetes_sd_configs:
+      - api_servers:
+        - 'https://kubernetes.default.svc'
+        in_cluster: true
+        role: node
+      relabel_configs:
+      - action: labelmap
+        regex: __meta_kubernetes_node_label_(.+)
+    - job_name: 'kubernetes-service-endpoints'
+      kubernetes_sd_configs:
+      - api_servers:
+        - 'https://kubernetes.default.svc'
+        in_cluster: true
+        role: endpoint
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+        action: replace
+        target_label: __scheme__
+        regex: (https?)
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
+        action: replace
+        target_label: __address__
+        regex: (.+)(?::\d+);(\d+)
+        replacement: $1:$2
+      - action: labelmap
+        regex: __meta_kubernetes_service_label_(.+)
+      - source_labels: [__meta_kubernetes_service_namespace]
+        action: replace
+        target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_service_name]
+        action: replace
+        target_label: kubernetes_name
+    - job_name: 'kubernetes-services'
+      metrics_path: /probe
+      params:
+        module: [http_2xx]
+      kubernetes_sd_configs:
+      - api_servers:
+        - 'https://kubernetes.default.svc'
+        in_cluster: true
+        role: service
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_probe]
+        action: keep
+        regex: true
+      - source_labels: [__address__]
+        target_label: __param_target
+      - target_label: __address__
+        replacement: blackbox
+      - source_labels: [__param_target]
+        target_label: instance
+      - action: labelmap
+        regex: __meta_kubernetes_service_label_(.+)
+      - source_labels: [__meta_kubernetes_service_namespace]
+        target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_service_name]
+        target_label: kubernetes_name
+    - job_name: 'kubernetes-pods'
+      kubernetes_sd_configs:
+      - api_servers:
+        - 'https://kubernetes.default.svc'
+        in_cluster: true
+        role: pod
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        regex: (.+):(?:\d+);(\d+)
+        replacement: ${1}:${2}
+        target_label: __address__
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
+      - source_labels: [__meta_kubernetes_pod_namespace]
+        action: replace
+        target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: kubernetes_pod_name
+    - job_name: ec2
+      ec2_sd_configs:
+      - region: us-east-1
+        access_key: aws_access_key
+        secret_key: aws_secret_key
+        refresh_interval: 60s
+        port: 9100
+      relabel_configs:
+      - action: labelmap
+        regex: __meta_ec2_tag_(.+)
+    rule_files:
+      - '/etc/prometheus/alert.rules'
+  alert.rules: |-
+      # Alert for any instance that is unreachable for >1 minute.
+      ALERT InstanceDown
+        IF up == 0
+        FOR 1m
+        LABELS { severity = "critical" }
+        ANNOTATIONS {
+          summary = "Instance {{ $labels.instance }} down",
+          description = "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minute.",
+        }
+
+      # Alert for any instance that have a median request latency >1s.
+      ALERT APIHighRequestLatency
+        IF api_http_request_latencies_second{quantile="0.5"} > 1
+        FOR 1m
+        ANNOTATIONS {
+          summary = "High request latency on {{ $labels.instance }}",
+          description = "{{ $labels.instance }} has a median request latency above 1s (current value: {{ $value }}s)",
+        }
+      ALERT HTTPRequestsSlow
+      IF histogram_quantile(0.99, rate(etcd_http_successful_duration_seconds_bucket[5m])) > 0.15
+      FOR 10m
+      LABELS {
+        severity = "warning"
+      }
+      ANNOTATIONS {
+        summary = "slow HTTP requests",
+        description = "on ectd instance {{ $labels.instance }} HTTP requests to {{ $label.method }} are slow",
+      }
+
+      # Alert for any instance that have less than 10% of free disk space.
+      ALERT HighDiskUsage
+        IF node_filesystem_free{device="/dev/xvda9"}<node_filesystem_size/10
+        FOR 1m
+        ANNOTATIONS {
+          summary = "Low disk space on {{ $labels.instance }}",
+          description = "{{ $labels.instance }} has less than 10% of free disk space",
+        }
