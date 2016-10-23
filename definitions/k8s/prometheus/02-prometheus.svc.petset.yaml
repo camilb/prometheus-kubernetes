@@ -32,8 +32,6 @@ spec:
       annotations:
         pod.alpha.kubernetes.io/initialized: "true"
     spec:
-      nodeSelector:
-        role: monitoring
       terminationGracePeriodSeconds: 0
       containers:
       - name: prometheus-prom-1

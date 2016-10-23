@@ -130,7 +130,7 @@ sed -i -e 's/slack_channel/'"$slack_channel"'/g' k8s/prometheus/03-alertmanager.
 
 
 #remove  "sed" generated files
-rm k8s/prometheus/*.yaml-e && rm k8s/ingress/*.yaml-e
+rm k8s/prometheus/*.yaml-e && rm k8s/ingress/*.yaml-e && rm k8s/grafana/*.yaml-e
 
 echo
 
