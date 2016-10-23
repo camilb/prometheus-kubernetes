@@ -1,5 +1,12 @@
 # Monitoring Kubernetes  clusters on AWS using Prometheus
 
+####Configuration
+
+* A new namespace is created named `monitoring`
+* Prometheus is deployed in a `PetSet` with external EBS disk attached to pod for data storage
+* Nginx Ingress Controller to access the dashboards 
+
+![alt](https://www.camil.org/content/images/2016/10/prom-1.png)
 
 #### Prerequisites
 
