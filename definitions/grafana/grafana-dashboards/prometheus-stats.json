@@ -1,5 +1,5 @@
 {
-  "id": 2,
+  "id": 1,
   "title": "Prometheus Stats Extended",
   "description": "VIew Prometheus internal metrics: an extension of the standard dashboard.",
   "tags": [
@@ -8,7 +8,7 @@
   "style": "dark",
   "timezone": "browser",
   "editable": true,
-  "hideControls": true,
+  "hideControls": false,
   "sharedCrosshair": true,
   "rows": [
     {
@@ -74,11 +74,11 @@
           },
           "targets": [
             {
-              "expr": "(time() - process_start_time_seconds{name=\"prometheus\"})",
+              "expr": "(time() - process_start_time_seconds{job=\"prometheus\"})",
               "intervalFactor": 2,
+              "legendFormat": "",
               "refId": "A",
-              "step": 4,
-              "legendFormat": ""
+              "step": 4
             }
           ],
           "thresholds": "",
@@ -528,7 +528,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "prometheus_evaluator_duration_milliseconds{quantile!=\"0.01\", quantile!=\"0.05\"}",
+              "expr": "prometheus_evaluator_duration_seconds{quantile!=\"0.01\", quantile!=\"0.05\"}",
               "interval": "",
               "intervalFactor": 2,
               "legendFormat": "{{quantile}}",
@@ -551,7 +551,7 @@
           },
           "yaxes": [
             {
-              "format": "percentunit",
+              "format": "s",
               "label": "",
               "logBase": 1,
               "max": null,
@@ -1268,7 +1268,7 @@
   },
   "refresh": "10s",
   "schemaVersion": 12,
-  "version": 5,
+  "version": 0,
   "links": [
     {
       "icon": "info",

@@ -2,7 +2,9 @@
   "id": 3,
   "title": "Prometheus Data Exploration",
   "description": "VERY simple dashboard to VERY easily view and explore Prometheus data. Just click away.",
-  "tags": [],
+  "tags": [
+    "prometheus"
+  ],
   "style": "dark",
   "timezone": "browser",
   "editable": true,

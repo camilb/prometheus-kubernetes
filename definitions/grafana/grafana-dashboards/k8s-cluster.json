@@ -74,7 +74,7 @@
           },
           "targets": [
             {
-              "expr": "sum (container_memory_working_set_bytes{id=\"/\",kubernetes_io_hostname=~\"^$Node$\"}) / sum (machine_memory_bytes{kubernetes_io_hostname=~\"^$Node$\"}) * 100",
+              "expr": "sum (container_memory_working_set_bytes{id=\"/\",instance=~\"^$Node$\"}) / sum (machine_memory_bytes{instance=~\"^$Node$\"}) * 100",
               "interval": "10s",
               "intervalFactor": 1,
               "legendFormat": "",
@@ -154,7 +154,7 @@
           },
           "targets": [
             {
-              "expr": "sum (rate (container_cpu_usage_seconds_total{id=\"/\",kubernetes_io_hostname=~\"^$Node$\"}[1m])) / sum (machine_cpu_cores{kubernetes_io_hostname=~\"^$Node$\"}) * 100",
+              "expr": "sum (rate (container_cpu_usage_seconds_total{id=\"/\",instance=~\"^$Node$\"}[1m])) / sum (machine_cpu_cores{instance=~\"^$Node$\"}) * 100",
               "interval": "10s",
               "intervalFactor": 1,
               "legendFormat": "",
@@ -316,7 +316,7 @@
           },
           "targets": [
             {
-              "expr": "sum (container_memory_working_set_bytes{id=\"/\",kubernetes_io_hostname=~\"^$Node$\"})",
+              "expr": "sum (container_memory_working_set_bytes{id=\"/\",instance=~\"^$Node$\"})",
               "interval": "10s",
               "intervalFactor": 1,
               "refId": "A",
@@ -396,7 +396,7 @@
           },
           "targets": [
             {
-              "expr": "sum (machine_memory_bytes{kubernetes_io_hostname=~\"^$Node$\"})",
+              "expr": "sum (machine_memory_bytes{instance=~\"^$Node$\"})",
               "interval": "10s",
               "intervalFactor": 1,
               "legendFormat": "",
@@ -477,7 +477,7 @@
           },
           "targets": [
             {
-              "expr": "sum (rate (container_cpu_usage_seconds_total{id=\"/\",kubernetes_io_hostname=~\"^$Node$\"}[1m]))",
+              "expr": "sum (rate (container_cpu_usage_seconds_total{id=\"/\",instance=~\"^$Node$\"}[1m]))",
               "interval": "10s",
               "intervalFactor": 1,
               "legendFormat": "",
@@ -558,7 +558,7 @@
           },
           "targets": [
             {
-              "expr": "sum (machine_cpu_cores{kubernetes_io_hostname=~\"^$Node$\"})",
+              "expr": "sum (machine_cpu_cores{instance=~\"^$Node$\"})",
               "interval": "10s",
               "intervalFactor": 1,
               "legendFormat": "",
@@ -639,7 +639,7 @@
           },
           "targets": [
             {
-              "expr": "sum (container_fs_usage_bytes{device=\"/dev/xvda9\",id=\"/\",kubernetes_io_hostname=~\"^$Node$\"})",
+              "expr": "sum (container_fs_usage_bytes{device=\"/dev/xvda9\",id=\"/\",instance=~\"^$Node$\"})",
               "interval": "10s",
               "intervalFactor": 1,
               "legendFormat": "",
@@ -720,7 +720,7 @@
           },
           "targets": [
             {
-              "expr": "sum (container_fs_limit_bytes{device=\"/dev/xvda9\",id=\"/\",kubernetes_io_hostname=~\"^$Node$\"})",
+              "expr": "sum (container_fs_limit_bytes{device=\"/dev/xvda9\",id=\"/\",instance=~\"^$Node$\"})",
               "interval": "10s",
               "intervalFactor": 1,
               "legendFormat": "",
@@ -800,7 +800,7 @@
           },
           "targets": [
             {
-              "expr": "sum(kubelet_running_pod_count{instance=~\"^$Node$\",job=\"kubernetes-nodes\"})",
+              "expr": "sum(kubelet_running_pod_count{instance=~\"^$Node$\",job=\"kubelets\"})",
               "interval": "10s",
               "intervalFactor": 2,
               "legendFormat": "",
@@ -880,7 +880,7 @@
           },
           "targets": [
             {
-              "expr": "sum(kubelet_running_container_count{instance=~\"^$Node$\",job=\"kubernetes-nodes\"})",
+              "expr": "sum(kubelet_running_container_count{instance=~\"^$Node$\",job=\"kubelets\"})",
               "interval": "10s",
               "intervalFactor": 2,
               "legendFormat": "",
@@ -1151,7 +1151,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum (rate (container_cpu_usage_seconds_total{image!=\"\",kubernetes_io_hostname=~\"^$Node$\"}[1m])) by (pod_name)",
+              "expr": "sum (rate (container_cpu_usage_seconds_total{image!=\"\",instance=~\"^$Node$\"}[1m])) by (pod_name)",
               "interval": "10s",
               "intervalFactor": 1,
               "legendFormat": "{{ pod_name }}",
@@ -1256,7 +1256,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum (container_memory_working_set_bytes{image!=\"\",name=~\"^k8s_.*\",kubernetes_io_hostname=~\"^$Node$\"}) by (pod_name)",
+              "expr": "sum (container_memory_working_set_bytes{image!=\"\",name=~\"^k8s_.*\",instance=~\"^$Node$\"}) by (pod_name)",
               "interval": "10s",
               "intervalFactor": 1,
               "legendFormat": "{{ pod_name }}",
@@ -1353,7 +1353,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sort_desc(sum by (pod_name) (rate (container_network_receive_bytes_total{kubernetes_io_hostname=~\"^$Node$\",name!=\"\", pod_name=~\".*\"}[1m]) ))",
+              "expr": "sort_desc(sum by (pod_name) (rate (container_network_receive_bytes_total{instance=~\"^$Node$\",name!=\"\", pod_name=~\".*\"}[1m]) ))",
               "interval": "10s",
               "intervalFactor": 1,
               "legendFormat": "{{ pod_name }}Reveived",
@@ -1362,7 +1362,7 @@
               "step": 10
             },
             {
-              "expr": "- sort_desc(sum by (pod_name) (rate (container_network_transmit_bytes_total{kubernetes_io_hostname=~\"^$Node$\",name!=\"\", pod_name=~\".*\"}[1m]) ))",
+              "expr": "- sort_desc(sum by (pod_name) (rate (container_network_transmit_bytes_total{instance=~\"^$Node$\",name!=\"\", pod_name=~\".*\"}[1m]) ))",
               "interval": "10s",
               "intervalFactor": 1,
               "legendFormat": "{{ pod_name }}Sent",
@@ -1490,7 +1490,7 @@
             "selected": false
           }
         ],
-        "query": "label_values(kubelet_running_pod_count{job=\"kubernetes-nodes\"}, instance)",
+        "query": "label_values(kubelet_running_pod_count{job=\"kubelets\"}, instance)",
         "refresh": 1,
         "regex": "",
         "type": "query"
