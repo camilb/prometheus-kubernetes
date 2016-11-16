@@ -1,7 +1,7 @@
 #!/bin/bash
 
 GRAFANA_VERSION=3.1.1
-PROMETHEUS_VERSION=v1.2.1
+PROMETHEUS_VERSION=v1.3.1
 DOCKER_USER=camil
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -169,6 +169,13 @@ echo
 echo -e "${ORANGE}Deploying Prometheus"
 tput sgr0
 kubectl create -f ./k8s/prometheus
+
+echo
+
+#deploy kube-state-metrics
+echo -e "${ORANGE}Deploying Kube State Metrics exporter"
+tput sgr0
+kubectl create -f ./k8s/kube-state-metrics
 
 echo
 
