@@ -26,7 +26,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(245, 54, 54, 0.9)"
           ],
-          "datasource": "prometheus.default.svc.cluster.local",
+          "datasource": "prometheus.monitoring.svc.cluster.local",
           "decimals": null,
           "editable": true,
           "error": false,
@@ -106,7 +106,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "prometheus.default.svc.cluster.local",
+          "datasource": "prometheus.monitoring.svc.cluster.local",
           "editable": true,
           "error": false,
           "format": "none",
@@ -189,7 +189,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(245, 54, 54, 0.9)"
           ],
-          "datasource": "prometheus.default.svc.cluster.local",
+          "datasource": "prometheus.monitoring.svc.cluster.local",
           "editable": true,
           "error": false,
           "format": "none",
@@ -268,7 +268,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(245, 54, 54, 0.9)"
           ],
-          "datasource": "prometheus.default.svc.cluster.local",
+          "datasource": "prometheus.monitoring.svc.cluster.local",
           "editable": true,
           "error": false,
           "format": "bytes",
@@ -347,7 +347,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(245, 54, 54, 0.9)"
           ],
-          "datasource": "prometheus.default.svc.cluster.local",
+          "datasource": "prometheus.monitoring.svc.cluster.local",
           "editable": true,
           "error": false,
           "format": "bytes",
@@ -426,7 +426,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(245, 54, 54, 0.9)"
           ],
-          "datasource": "prometheus.default.svc.cluster.local",
+          "datasource": "prometheus.monitoring.svc.cluster.local",
           "editable": true,
           "error": false,
           "format": "s",
@@ -507,7 +507,7 @@
         {
           "aliasColors": {},
           "bars": false,
-          "datasource": "prometheus.default.svc.cluster.local",
+          "datasource": "prometheus.monitoring.svc.cluster.local",
           "decimals": 2,
           "editable": true,
           "error": false,
@@ -589,7 +589,7 @@
             "free": "#7EB26D"
           },
           "bars": false,
-          "datasource": "prometheus.default.svc.cluster.local",
+          "datasource": "prometheus.monitoring.svc.cluster.local",
           "editable": true,
           "error": false,
           "fill": 1,
@@ -677,7 +677,7 @@
             "free": "#7EB26D"
           },
           "bars": false,
-          "datasource": "prometheus.default.svc.cluster.local",
+          "datasource": "prometheus.monitoring.svc.cluster.local",
           "editable": true,
           "error": false,
           "fill": 7,
@@ -794,7 +794,7 @@
             "free": "#7EB26D"
           },
           "bars": false,
-          "datasource": "prometheus.default.svc.cluster.local",
+          "datasource": "prometheus.monitoring.svc.cluster.local",
           "editable": true,
           "error": false,
           "fill": 1,
@@ -900,7 +900,7 @@
             "used": "#EAB839"
           },
           "bars": false,
-          "datasource": "prometheus.default.svc.cluster.local",
+          "datasource": "prometheus.monitoring.svc.cluster.local",
           "editable": true,
           "error": false,
           "fill": 7,
@@ -1010,7 +1010,7 @@
             "used": "#EAB839"
           },
           "bars": false,
-          "datasource": "prometheus.default.svc.cluster.local",
+          "datasource": "prometheus.monitoring.svc.cluster.local",
           "editable": true,
           "error": false,
           "fill": 7,
@@ -1122,7 +1122,7 @@
             "used": "#EAB839"
           },
           "bars": false,
-          "datasource": "prometheus.default.svc.cluster.local",
+          "datasource": "prometheus.monitoring.svc.cluster.local",
           "editable": true,
           "error": false,
           "fill": 7,
@@ -1267,7 +1267,7 @@
           "text": "10.35.140.5",
           "value": "10.35.140.5"
         },
-        "datasource": "prometheus.default.svc.cluster.local",
+        "datasource": "prometheus.monitoring.svc.cluster.local",
         "hide": 1,
         "hideLabel": true,
         "includeAll": false,
@@ -1309,7 +1309,7 @@
           "text": "All",
           "value": "$__all"
         },
-        "datasource": "prometheus.default.svc.cluster.local",
+        "datasource": "prometheus.monitoring.svc.cluster.local",
         "hide": 2,
         "hideVariable": true,
         "includeAll": true,
