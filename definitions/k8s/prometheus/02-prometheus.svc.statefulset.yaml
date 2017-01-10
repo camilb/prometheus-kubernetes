@@ -18,7 +18,7 @@ spec:
     targetPort: 9090
 ---
 apiVersion: apps/v1alpha1
-kind: PetSet
+kind: StatefulSet
 metadata:
   name: prometheus
   namespace: monitoring
@@ -35,7 +35,7 @@ spec:
       terminationGracePeriodSeconds: 0
       containers:
       - name: prometheus-prom-1
-        image: prom/prometheus:v1.3.1
+        image: prom/prometheus:v1.4.1
         args:
           - '-storage.local.retention=720h'
           - '-storage.local.memory-chunks=500000'
