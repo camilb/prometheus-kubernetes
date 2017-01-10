@@ -14,15 +14,16 @@ spec:
   selector:
     k8s-app: default-http-backend
 ---
-apiVersion: v1
-kind: ReplicationController
+apiVersion: extensions/v1beta1
+kind: Deployment
 metadata:
   name: default-http-backend
   namespace: monitoring
 spec:
   replicas: 1
   selector:
-    k8s-app: default-http-backend
+    matchLabels:
+      k8s-app: default-http-backend
   template:
     metadata:
       labels:
@@ -49,8 +50,8 @@ spec:
             cpu: 10m
             memory: 20Mi
 ---
-apiVersion: v1
-kind: ReplicationController
+apiVersion: extensions/v1beta1
+kind: Deployment
 metadata:
   name: nginx-ingress-controller
   namespace: monitoring
@@ -59,7 +60,8 @@ metadata:
 spec:
   replicas: 1
   selector:
-    k8s-app: nginx-ingress-lb
+    matchLabels:
+      k8s-app: nginx-ingress-lb
   template:
     metadata:
       labels:

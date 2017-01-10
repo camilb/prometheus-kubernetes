@@ -3,8 +3,8 @@
 ####Configuration
 
 * A new namespace is created named `monitoring`
-* Prometheus is deployed in a `PetSet` with external EBS disk attached to pod for data storage
-* Nginx Ingress Controller to access the dashboards 
+* Prometheus is deployed in a `StatefulSet` with external EBS disk attached to pod for data storage
+* Nginx Ingress Controller to access the dashboards
 
 ![alt](https://www.camil.org/content/images/2016/10/prom-1.png)
 
@@ -35,9 +35,9 @@ Clone repository
 
 Change these values in `init.sh`.
 
-`GRAFANA_VERSION=3.1.1`
+`GRAFANA_VERSION=4.1.0-beta1`
 
-`PROMETHEUS_VERSION=v1.2.1`
+`PROMETHEUS_VERSION=v1.4.1`
 
 `DOCKER_USER=your_dockerhub_user`
 
