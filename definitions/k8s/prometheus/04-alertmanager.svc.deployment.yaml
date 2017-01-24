@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
       - name: alertmanager
-        image: prom/alertmanager:v0.5.0
+        image: prom/alertmanager:v0.5.1
         ports:
         - containerPort: 9093
         imagePullPolicy: Always
