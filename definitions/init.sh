@@ -1,8 +1,8 @@
 #!/bin/bash
 
-GRAFANA_VERSION=4.1.1
-PROMETHEUS_VERSION=v1.5.0
-DOCKER_USER=camil
+GRAFANA_DEFAULT_VERSION=4.2.0
+PROMETHEUS_DEFAULT_VERSION=v1.6.3
+DOCKER_USER_DEFAULT=$(docker info|grep Username:|awk '{print $2}')
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 ORANGE='\033[0;33m'
@@ -15,8 +15,23 @@ tput sgr0
 #create a separate namespace for monitoring
 kubectl create namespace monitoring
 
+#Ask for grafana version or apply default
 echo
+read -p "Enter Grafana version [$GRAFANA_DEFAULT_VERSION]: " GRAFANA_VERSION
+GRAFANA_VERSION=${GRAFANA_VERSION:-$GRAFANA_DEFAULT_VERSION}
+
+#Ask for prometheus version or apply default
+echo
+read -p "Enter Prometheus version [$PROMETHEUS_DEFAULT_VERSION]: " PROMETHEUS_VERSION
+PROMETHEUS_VERSION=${PROMETHEUS_VERSION:-$PROMETHEUS_DEFAULT_VERSION}
+
+#Ask for dockerhub user or apply default of the current logged-in username
+echo
+read -p "Enter Dockerhub username [$DOCKER_USER_DEFAULT]: " DOCKER_USER
+DOCKER_USER=${DOCKER_USER:-$DOCKER_USER_DEFAULT}
+
 #Set username and password for basic-auth
+echo
 echo -e "${BLUE}Please set the username and password for basic-auth and [ENTER]:"
 tput sgr0
 
@@ -66,49 +81,63 @@ echo -e "${BLUE}SMTP password set."
 tput sgr0
 echo
 
-#AWS credentials for EC2 monitoring
-echo -e "${ORANGE}Insert your AWS Access Key and press [ENTER]:"
+#try to figure out AWS credentials for EC2 monitoring, if not...ask.
+echo -e "${BLUE}Detecting AWS access keys."
 tput sgr0
-
-#aws access key
-prompt="AWS Access Key:"
-tput sgr0
-while IFS= read -p "$prompt" -r -s -n 1 char
-do
-    if [[ $char == $'\0' ]]
-    then
-        break
-    fi
-    prompt='*'
-    aws_access_key+="$char"
-done
 echo
+if [ ! -z $AWS_ACCESS_KEY_ID ] && [ ! -z $AWS_SECRET_ACCESS_KEY ]; then
+  aws_access_key=$AWS_ACCESS_KEY_ID
+  aws_access_password=$AWS_SECRET_ACCESS_KEY
+  echo -e "${ORANGE}AWS_ACCESS_KEY_ID found, using $aws_access_key."
+  tput sgr0
+  echo
+elif [ ! -z $AWS_ACCESS_KEY ] && [ ! -z $AWS_SECRET_KEY ]; then
+  aws_access_key=$AWS_ACCESS_KEY
+  aws_access_password=$AWS_SECRET_KEY
+  echo -e "${ORANGE}AWS_ACCESS_KEY found, using $aws_access_key."
+  tput sgr0
+  echo
+else
+  echo -e "${RED}Unable to determine AWS credetials from environment variables."
+  echo -e "${ORANGE}Insert your AWS Access Key ID and press [ENTER]:"
+  tput sgr0
+
+  #aws access key
+  prompt="AWS Access Key ID:"
+  tput sgr0
+  while IFS= read -p "$prompt" -r -s -n 1 char
+  do
+      if [[ $char == $'\0' ]]
+      then
+          break
+      fi
+      prompt='*'
+      aws_access_key+="$char"
+  done
+  echo
+
+  #aws secret access key
+  echo -e "${ORANGE}Insert your AWS Secret Access Key and press [ENTER]:"
+  tput sgr0
+
+  prompt="AWS Secret Access Key:"
+  tput sgr0
+  while IFS= read -p "$prompt" -r -s -n 1 char
+  do
+      if [[ $char == $'\0' ]]
+      then
+          break
+      fi
+      prompt='*'
+      aws_access_password+="$char"
+  done
+  echo
+fi
+
+#sed in the AWS credentials. this looks odd because aws secret access keys can have '/' as a valid character
+#so we use ',' as a delimiter for sed, since that won't appear in the secret key
 sed -i -e 's/aws_access_key/'"$aws_access_key"'/g' k8s/prometheus/01-prometheus.configmap.yaml
-echo -e "${ORANGE}AWS Access Key set."
-echo
-tput sgr0
-
-#aws access password
-echo -e "${ORANGE}Insert your AWS Access Password and press [ENTER]:"
-tput sgr0
-
-prompt="AWS Access Password:"
-tput sgr0
-while IFS= read -p "$prompt" -r -s -n 1 char
-do
-    if [[ $char == $'\0' ]]
-    then
-        break
-    fi
-    prompt='*'
-    aws_access_password+="$char"
-done
-echo
-sed -i -e 's/aws_access_password/'"$aws_access_password"'/g' k8s/prometheus/01-prometheus.configmap.yaml
-echo -e "${ORANGE}AWS Access Password set."
-tput sgr0
-
-echo
+sed -i -e 's,aws_access_password,'"$aws_access_password"',g' k8s/prometheus/01-prometheus.configmap.yaml
 
 #slack channel
 echo -e "${PURPLE}Insert your slack channel name where you wish to receive alerts and press [ENTER]:"
@@ -155,6 +184,19 @@ echo
 echo -e "${BLUE}Pushing grafana docker image to DockerHub"
 tput sgr0
 docker push $DOCKER_USER/grafana:$GRAFANA_VERSION
+#upon failure, run docker login
+if [ $? -eq 1 ];then
+  echo -e "${RED}docker push failed! perhaps you need to login \"${DOCKER_USER}\" to dockerhub?"
+  tput sgr0
+  docker login -u $DOCKER_USER
+  #try again
+  docker push $DOCKER_USER/grafana:$GRAFANA_VERSION
+  if [ $? -eq 1 ];then
+    echo -e "${RED}docker push failed a second time! exiting."
+    ./cleanup.sh
+    exit 1
+  fi
+fi
 
 echo
 
