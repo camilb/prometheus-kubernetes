@@ -2,7 +2,7 @@
 
 GRAFANA_DEFAULT_VERSION=4.2.0
 PROMETHEUS_DEFAULT_VERSION=v1.6.3
-DOCKER_USER_DEFAULT=$(whoami)
+DOCKER_USER_DEFAULT=$(docker info|grep Username:|awk '{print $2}')
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 ORANGE='\033[0;33m'
@@ -184,6 +184,19 @@ echo
 echo -e "${BLUE}Pushing grafana docker image to DockerHub"
 tput sgr0
 docker push $DOCKER_USER/grafana:$GRAFANA_VERSION
+#upon failure, run docker login
+if [ $? -eq 1 ];then
+  echo -e "${RED}docker push failed! perhaps you need to login \"${DOCKER_USER}\" to dockerhub?"
+  tput sgr0
+  docker login -u $DOCKER_USER
+  #try again
+  docker push $DOCKER_USER/grafana:$GRAFANA_VERSION
+  if [ $? -eq 1 ];then
+    echo -e "${RED}docker push failed a second time! exiting."
+    ./cleanup.sh
+    exit 1
+  fi
+fi
 
 echo
 
