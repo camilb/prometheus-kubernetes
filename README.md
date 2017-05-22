@@ -41,6 +41,8 @@ Change these values in `init.sh`.
 
 `DOCKER_USER=your_dockerhub_user`
 
+NOTE: ensure you are logged into dockerhub or you may get a confusing "permission denied" error during `docker push`
+
 Make the necessary changes in `Configmaps` according to your setup.
 
 **Deploy Prometheus and Grafana**
