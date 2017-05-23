@@ -1,108 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: prometheus
+  name: alerts
   namespace: monitoring
 data:
-  prometheus.yml: |-
-    global:
-      evaluation_interval: 30s
-    scrape_configs:
-
-    - job_name: kubelets
-
-      scrape_interval: 20s
-      scheme: https
-      tls_config:
-        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        insecure_skip_verify: true
-      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-      kubernetes_sd_configs:
-      - role: node
-
-    - job_name: standard-endpoints
-
-      scrape_interval: 20s
-      tls_config:
-        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        insecure_skip_verify: true
-      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-      kubernetes_sd_configs:
-      - role: endpoints
-      relabel_configs:
-      - action: keep
-        source_labels: [__meta_kubernetes_service_name]
-        regex: kubernetes|node-exporter|kube-state-metrics|etcd-k8s|prometheus
-      - action: replace
-        source_labels: [__meta_kubernetes_service_name]
-        target_label: job
-      - action: replace
-        source_labels: [__meta_kubernetes_service_name]
-        regex: kubernetes
-        target_label: __scheme__
-        replacement: https
-
-    - job_name: kube-components
-
-      scrape_interval: 20s
-      tls_config:
-        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-      kubernetes_sd_configs:
-      - role: endpoints
-      relabel_configs:
-      - action: replace
-        source_labels: [__meta_kubernetes_service_name]
-        target_label: job
-        regex: "kube-(.*)-prometheus-discovery"
-        replacement: "kube-${1}"
-      - action: keep
-        source_labels: [__meta_kubernetes_service_name]
-        regex: "kube-(.*)-prometheus-discovery"
-      - action: keep
-        source_labels: [__meta_kubernetes_endpoint_port_name]
-        regex: "prometheus"
-
-    - job_name: 'kubernetes-pods'
-
-      kubernetes_sd_configs:
-      - role: pod
-      relabel_configs:
-      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
-        action: keep
-        regex: true
-      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
-        action: replace
-        target_label: __metrics_path__
-        regex: (.+)
-      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
-        action: replace
-        regex: (.+):(?:\d+);(\d+)
-        replacement: ${1}:${2}
-        target_label: __address__
-      - action: labelmap
-        regex: __meta_kubernetes_pod_label_(.+)
-      - source_labels: [__meta_kubernetes_pod_namespace]
-        action: replace
-        target_label: kubernetes_namespace
-      - source_labels: [__meta_kubernetes_pod_name]
-        action: replace
-        target_label: kubernetes_pod_name
-
-    - job_name: ec2
-
-      ec2_sd_configs:
-      - region: us-east-1
-        access_key: aws_access_key
-        secret_key: aws_secret_key
-        refresh_interval: 60s
-        port: 9100
-      relabel_configs:
-      - action: labelmap
-        regex: __meta_ec2_tag_(.+)
-    rule_files:
-      - '/etc/prometheus/alert.rules'
-  alert.rules: |-
+  kubernetes.rules: |-
        ### Container resources ###
        cluster_namespace_controller_pod_container:spec_memory_limit_bytes =
          sum by (cluster,namespace,controller,pod_name,container_name) (
@@ -303,7 +205,7 @@ data:
          }
        ALERT K8SApiserverDown
          IF up{job="kubernetes"} == 0
-         FOR 5m
+         FOR 10m
          LABELS {
            service = "k8s",
            severity = "warning"
@@ -416,4 +318,12 @@ data:
          ANNOTATIONS {
            summary = "Kubelet is close to pod limit",
            description = "Kubelet {{$labels.instance}} is running {{$value}} pods, close to the limit of 110",
+         }
+       ALERT PodRestartingTooMuch
+         IF          rate(kube_pod_container_status_restarts[10m])*600 > 2
+         FOR         5m
+         LABELS      { severity="warning" }
+         ANNOTATIONS {
+           summary = "Pod {{$labels.namespace}}/{{$label.name}} restarting too much.",
+           description = "Pod {{$labels.namespace}}/{{$label.name}} restarting too much.",
          }

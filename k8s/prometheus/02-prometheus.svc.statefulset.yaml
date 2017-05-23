@@ -32,10 +32,11 @@ spec:
       annotations:
         pod.alpha.kubernetes.io/initialized: "true"
     spec:
+      serviceAccountName: default
       terminationGracePeriodSeconds: 0
       containers:
       - name: prometheus-prom-1
-        image: prom/prometheus:v1.5.0
+        image: prom/prometheus:PROMETHEUS_VERSION
         args:
           - '-storage.local.retention=720h'
           - '-storage.local.memory-chunks=500000'
@@ -49,10 +50,15 @@ spec:
           mountPath: /etc/prometheus
         - name: prometheus-prom-1
           mountPath: /prometheus
+        - name: alerts-volume
+          mountPath: /etc/alertmanager
       volumes:
       - name: config-volume
         configMap:
           name: prometheus
+      - name: alerts-volume
+        configMap:
+          name: alerts
   volumeClaimTemplates:
   - metadata:
       name: prometheus-prom-1

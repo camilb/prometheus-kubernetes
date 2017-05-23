@@ -1,7 +1,9 @@
 #!/bin/bash
 
-GRAFANA_DEFAULT_VERSION=4.2.0
+GRAFANA_DEFAULT_VERSION=4.3.0
 PROMETHEUS_DEFAULT_VERSION=v1.6.3
+ALERT_MANAGER_DEFAULT_VERSION=v0.7.0-rc.0
+NODE_EXPORTER_DEFAULT_VERSION=v0.14.0
 DOCKER_USER_DEFAULT=$(docker info|grep Username:|awk '{print $2}')
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -24,6 +26,17 @@ GRAFANA_VERSION=${GRAFANA_VERSION:-$GRAFANA_DEFAULT_VERSION}
 echo
 read -p "Enter Prometheus version [$PROMETHEUS_DEFAULT_VERSION]: " PROMETHEUS_VERSION
 PROMETHEUS_VERSION=${PROMETHEUS_VERSION:-$PROMETHEUS_DEFAULT_VERSION}
+
+#Ask for alertmanager version or apply default
+echo
+read -p "Enter Alert Manager version [$ALERT_MANAGER_DEFAULT_VERSION]: " ALERT_MANAGER_VERSION
+ALERT_MANAGER_VERSION=${ALERT_MANAGER_VERSION:-$ALERT_MANAGER_DEFAULT_VERSION}
+
+
+#Ask for node exporter version or apply default
+echo
+read -p "Enter Node Exporter version [$NODE_EXPORTER_DEFAULT_VERSION]: " NODE_EXPORTER_VERSION
+NODE_EXPORTER_VERSION=${NODE_EXPORTER_VERSION:-$NODE_EXPORTER_DEFAULT_VERSION}
 
 #Ask for dockerhub user or apply default of the current logged-in username
 echo
@@ -87,13 +100,13 @@ tput sgr0
 echo
 if [ ! -z $AWS_ACCESS_KEY_ID ] && [ ! -z $AWS_SECRET_ACCESS_KEY ]; then
   aws_access_key=$AWS_ACCESS_KEY_ID
-  aws_access_password=$AWS_SECRET_ACCESS_KEY
+  aws_secret_key=$AWS_SECRET_ACCESS_KEY
   echo -e "${ORANGE}AWS_ACCESS_KEY_ID found, using $aws_access_key."
   tput sgr0
   echo
 elif [ ! -z $AWS_ACCESS_KEY ] && [ ! -z $AWS_SECRET_KEY ]; then
   aws_access_key=$AWS_ACCESS_KEY
-  aws_access_password=$AWS_SECRET_KEY
+  aws_secret_key=$AWS_SECRET_KEY
   echo -e "${ORANGE}AWS_ACCESS_KEY found, using $aws_access_key."
   tput sgr0
   echo
@@ -129,7 +142,7 @@ else
           break
       fi
       prompt='*'
-      aws_access_password+="$char"
+      aws_secret_key+="$char"
   done
   echo
 fi
@@ -137,7 +150,7 @@ fi
 #sed in the AWS credentials. this looks odd because aws secret access keys can have '/' as a valid character
 #so we use ',' as a delimiter for sed, since that won't appear in the secret key
 sed -i -e 's/aws_access_key/'"$aws_access_key"'/g' k8s/prometheus/01-prometheus.configmap.yaml
-sed -i -e 's,aws_access_password,'"$aws_access_password"',g' k8s/prometheus/01-prometheus.configmap.yaml
+sed -i -e 's,aws_secret_key,'"$aws_secret_key"',g' k8s/prometheus/01-prometheus.configmap.yaml
 
 #slack channel
 echo -e "${PURPLE}Insert your slack channel name where you wish to receive alerts and press [ENTER]:"
@@ -156,21 +169,34 @@ do
 done
 echo
 sed -i -e 's/slack_channel/'"$slack_channel"'/g' k8s/prometheus/03-alertmanager.configmap.yaml
+echo
+
+read -r -p "Is the RBAC plugin enabled? [y/N] " response
+if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]
+then
+    kubectl create -f ./k8s/rbac
+    sed -i -e 's/default/'prometheus'/g' k8s/prometheus/02-prometheus.svc.statefulset.yaml
+else
+    echo -e "${GREEN}Skipping RBAC configuration."
+    tput sgr0
+fi
+
+#set prometheus version
+sed -i -e 's/PROMETHEUS_VERSION/'"$PROMETHEUS_VERSION"'/g' k8s/prometheus/02-prometheus.svc.statefulset.yaml
+
+#set grafana version
+sed -i -e 's/GRAFANA_VERSION/'"$GRAFANA_VERSION"'/g' grafana/Dockerfile
+sed -i -e 's/GRAFANA_VERSION/'"$GRAFANA_VERSION"'/g' k8s/grafana/grafana.svc.deployment.yaml
+
+#set alertmanager version
+sed -i -e 's/ALERT_MANAGER_VERSION/'"$ALERT_MANAGER_VERSION"'/g' k8s/prometheus/04-alertmanager.svc.deployment.yaml
+
+#set node-exporter version
+sed -i -e 's/NODE_EXPORTER_VERSION/'"$NODE_EXPORTER_VERSION"'/g' k8s/prometheus/05-node-exporter.svc.daemonset.yaml
 
 
 #remove  "sed" generated files
-rm k8s/prometheus/*.yaml-e && rm k8s/ingress/*.yaml-e && rm k8s/grafana/*.yaml-e
-
-echo
-
-#nginx load balancer display errors if dhparam is not set
-echo -e "${RED}Generate DH parameters for nginx."
-openssl dhparam -out dhparam.pem 1024
-tput sgr0
-
-echo -e "${BLUE}Create dhparam secret."
-tput sgr0
-kubectl create secret generic dhparam --from-file=dhparam.pem -n monitoring
+rm k8s/prometheus/*.yaml-e && rm k8s/ingress/*.yaml-e && rm k8s/grafana/*.yaml-e && rm grafana/*-e
 
 echo
 
@@ -210,7 +236,7 @@ echo
 #deploy prometheus
 echo -e "${ORANGE}Deploying Prometheus"
 tput sgr0
-kubectl create -f ./k8s/prometheus
+kubectl create -R -f ./k8s/prometheus
 
 echo
 
