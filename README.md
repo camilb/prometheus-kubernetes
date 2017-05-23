@@ -31,13 +31,13 @@ _____________________________________________________________________
 
 Clone repository
 
-    git clone github.com/camilb/prometheus-kubernetes && cd prometehus-kubernetes/definitions
+    git clone github.com/camilb/prometheus-kubernetes && cd prometehus-kubernetes
 
 Change these values in `init.sh`.
 
-`GRAFANA_VERSION=4.1.0-beta1`
+`GRAFANA_VERSION=4.3.0`
 
-`PROMETHEUS_VERSION=v1.4.1`
+`PROMETHEUS_VERSION=v1.6.3`
 
 `DOCKER_USER=your_dockerhub_user`
 

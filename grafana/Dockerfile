@@ -1,4 +1,4 @@
-FROM grafana/grafana:4.1.1
+FROM grafana/grafana:GRAFANA_VERSION
 MAINTAINER Camil Blanaru <camil@edka.io>
 
 ADD grafana-config/grafana.ini /etc/grafana/grafana.ini
