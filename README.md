@@ -21,9 +21,12 @@
 
 Clone repository
 
-    git clone github.com/camilb/prometheus-kubernetes && cd prometehus-kubernetes/definitions
+    git clone github.com/camilb/prometheus-kubernetes && cd prometehus-kubernetes
 
-Make any desired configration changes in `Configmaps` according to your setup.
+Make any desired configration changes in `configmaps` according to your setup.
+* ./k8s/prometheus/01-prometheus.configmap.yaml
+* ./k8s/prometheus/03-alertmanager.configmap.yaml
+
 
 ## Deploy Prometheus with Grafana
 
