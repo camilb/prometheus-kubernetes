@@ -1,6 +1,6 @@
 # Monitoring Kubernetes  clusters on AWS using Prometheus
 
-####Configuration
+## Configuration
 
 * A new namespace is created named `monitoring`
 * Prometheus is deployed in a `StatefulSet` with external EBS disk attached to pod for data storage
@@ -8,46 +8,31 @@
 
 ![alt](https://www.camil.org/content/images/2016/10/prom-1.png)
 
-#### Prerequisites
+## Prerequisites
 
-_____________________________________________________________________
-
-######Basic
 * Kubernetes cluster and `kubectl` configured.
-
-######Alerting
 * SMTP Account for email alerts.
 * Token for alerts on Slack.
-
-######AWS
-* A IAM Role with EC2 ReadOnly access for EC2 instances monitoring.Only required for monitoring AWS nodes that are not part of the kubernetes cluster.
-
+* A IAM Role with EC2 ReadOnly access for EC2 instances monitoring. Only required for monitoring AWS nodes that are not part of the kubernetes cluster.
 * Security Groups configured to allow port 9100/TCP for `prometheus node-exporter` and 10250/TCP for k8s nodes metrics.
 
 
-#### Deployment
-
-_____________________________________________________________________
+## Pre-Deployment
 
 Clone repository
 
     git clone github.com/camilb/prometheus-kubernetes && cd prometehus-kubernetes
 
-Change these values in `init.sh`.
+Make any desired configration changes in `configmaps` according to your setup.
+* ./k8s/prometheus/01-prometheus.configmap.yaml
+* ./k8s/prometheus/03-alertmanager.configmap.yaml
 
-`GRAFANA_VERSION=4.3.0`
 
-`PROMETHEUS_VERSION=v1.6.3`
-
-`DOCKER_USER=your_dockerhub_user`
-
-Make the necessary changes in `Configmaps` according to your setup.
-
-**Deploy Prometheus and Grafana**
+## Deploy Prometheus with Grafana
 
     ./init.sh
 
-* The init script will first ask to set a username and a password for basic-auth access to Grafana, Prometheus and Alert Manager dashboards, the SMTP account password and AWS account credentials for EC2 auto-discovery.
+* The init script will ask some basic questions and attempt to autodiscover information about your system. 
 
 * Configure "/etc/hosts" or create DNS records with the hosts and IP from the Ingress Controller.
 
