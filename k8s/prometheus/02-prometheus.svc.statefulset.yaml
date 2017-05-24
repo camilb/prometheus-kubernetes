@@ -59,6 +59,12 @@ spec:
       - name: alerts-volume
         configMap:
           name: alerts
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 9090
+        initialDelaySeconds: 30
+        timeoutSeconds: 1
   volumeClaimTemplates:
   - metadata:
       name: prometheus-prom-1

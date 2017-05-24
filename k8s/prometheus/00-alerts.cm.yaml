@@ -175,7 +175,7 @@ data:
            description = "{{ $value }} K8s nodes (more than 10% of cluster {{ $labels.cluster }}) are in the NotReady state.",
          }
        ALERT HighDiskUsage
-         IF node_filesystem_free{device="/dev/xvda9"}<node_filesystem_size/10
+         IF node_filesystem_free{device="/dev/xvda1"}<node_filesystem_size/10
          FOR 1m
          ANNOTATIONS {
            summary = "Low disk space on {{ $labels.instance }}",

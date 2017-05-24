@@ -129,10 +129,11 @@ sed -i -e 's/aws_access_key/'"$aws_access_key"'/g' k8s/prometheus/01-prometheus.
 sed -i -e 's,aws_secret_key,'"$aws_secret_key"',g' k8s/prometheus/01-prometheus.configmap.yaml
 
 echo
-echo -e "${BLUE}Creating 'monitoring' namespace."
+echo -e "${BLUE}Creating ${ORANGE}'monitoring' ${BLUE}and ${ORANGE}'nginx-ingress' ${BLUE}namespaces."
 tput sgr0
 #create a separate namespace for monitoring
 kubectl create namespace monitoring
+kubectl create namespace nginx-ingress
 
 echo
 read -r -p "Is the RBAC plugin enabled? [y/N]: " response
@@ -141,7 +142,7 @@ then
     kubectl create -f ./k8s/rbac
     sed -i -e 's/default/'prometheus'/g' k8s/prometheus/02-prometheus.svc.statefulset.yaml
 else
-    echo -e "${GREEN}Skipping RBAC configuration."
+    echo -e "${GREEN}Skipping RBAC configuration"
 fi
 tput sgr0
 

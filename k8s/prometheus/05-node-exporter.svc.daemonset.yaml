@@ -44,3 +44,9 @@ spec:
           name: scrape
       hostNetwork: true
       hostPID: true
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 9100
+        initialDelaySeconds: 30
+        timeoutSeconds: 1
