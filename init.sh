@@ -33,17 +33,6 @@ NODE_EXPORTER_VERSION=${NODE_EXPORTER_VERSION:-$NODE_EXPORTER_DEFAULT_VERSION}
 read -p "Enter Dockerhub username [$DOCKER_USER_DEFAULT]: " DOCKER_USER
 DOCKER_USER=${DOCKER_USER:-$DOCKER_USER_DEFAULT}
 
-#Set username and password for basic-auth
-echo
-echo -e "${BLUE}Please set the username and password for basic-auth to prometheus and alertmanager:"
-tput sgr0
-read -p "Set username [monitor]: " username
-htpasswd -c auth ${username:-'monitor'}
-
-#base64 encode the basic-auth and set the secret
-BASIC_AUTH=$(cat ./auth | base64)
-sed -i -e 's/htpasswd/'"$BASIC_AUTH"'/g' k8s/ingress/01-basic-auth.secret.yaml
-
 #Replace Dockerhub username in grafana deployment.
 sed -i -e 's/DOCKER_USER/'"$DOCKER_USER"'/g' k8s/grafana/grafana.svc.deployment.yaml
 
@@ -129,17 +118,18 @@ sed -i -e 's/aws_access_key/'"$aws_access_key"'/g' k8s/prometheus/01-prometheus.
 sed -i -e 's,aws_secret_key,'"$aws_secret_key"',g' k8s/prometheus/01-prometheus.configmap.yaml
 
 echo
-echo -e "${BLUE}Creating ${ORANGE}'monitoring' ${BLUE}and ${ORANGE}'nginx-ingress' ${BLUE}namespaces."
+echo -e "${BLUE}Creating ${ORANGE}'monitoring' ${BLUE}namespace."
 tput sgr0
 #create a separate namespace for monitoring
 kubectl create namespace monitoring
-kubectl create namespace nginx-ingress
 
 echo
-read -r -p "Is the RBAC plugin enabled? [y/N]: " response
+echo -e "${BLUE}Is the RBAC plugin enabled?"
+tput sgr0
+read -p "[y/N]: " response
 if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]
 then
-    kubectl create -f ./k8s/rbac
+    kubectl create -f ./k8s/rbac/01-prometheus-rbac-config.yaml
     sed -i -e 's/default/'prometheus'/g' k8s/prometheus/02-prometheus.svc.statefulset.yaml
 else
     echo -e "${GREEN}Skipping RBAC configuration"
@@ -160,7 +150,7 @@ sed -i -e 's/ALERT_MANAGER_VERSION/'"$ALERT_MANAGER_VERSION"'/g' k8s/prometheus/
 sed -i -e 's/NODE_EXPORTER_VERSION/'"$NODE_EXPORTER_VERSION"'/g' k8s/prometheus/05-node-exporter.svc.daemonset.yaml
 
 #remove  "sed" generated files
-rm k8s/prometheus/*.yaml-e && rm k8s/ingress/*.yaml-e && rm k8s/grafana/*.yaml-e && rm grafana/*-e 2> /dev/null
+rm k8s/prometheus/*.yaml-e && rm k8s/grafana/*.yaml-e && rm grafana/*-e 2> /dev/null
 
 #build grafana image, push to dockerhub
 echo
@@ -200,25 +190,77 @@ echo
 echo -e "${ORANGE}Deploying Kube State Metrics exporter"
 tput sgr0
 kubectl create -f ./k8s/kube-state-metrics
-
-#deploy ingress controller
 echo
-echo -e "${BLUE}Deploying  K8S Ingress Controller"
+
+echo -e "${BLUE}Do you want to set up Nginx Ingress Controller?"
 tput sgr0
-kubectl create -f ./k8s/ingress
 
-#wait for the ingress to become available.
-echo
-echo -e "${BLUE}Waiting 10 seconds for the Ingress Controller to become available."
-tput sgr0
-sleep 10
-
-#get ingress IP and hosts, display for user
-PROM_INGRESS=$(kubectl get ing --namespace=monitoring)
-echo
-echo 'Configure "/etc/hosts" or create DNS records for these hosts:' && printf "${RED}$PROM_INGRESS"
+read -p "Y/N [N]: " deploy_nginx_ingress
 echo
 
+if [[ $deploy_nginx_ingress =~ ^([yY][eE][sS]|[yY])$ ]]; then
+
+  #create a separate namespace for ingress controller
+  echo -e "${BLUE}Creating ${ORANGE}'nginx-ingress' ${BLUE}namespace."
+  kubectl create namespace nginx-ingress
+
+  echo
+  echo -e "${BLUE}Is the RBAC plugin enabled?"
+  tput sgr0
+  read -p "[y/N]: " response
+  if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]
+  then
+      kubectl create -f ./k8s/rbac/02-nginx-ingress-rbac-config.yaml
+  else
+      echo -e "${GREEN}Skipping RBAC configuration"
+  fi
+  tput sgr0
+
+  #Do you want to set up slack?
+  echo
+  echo -e "${GREEN}Type your domain name."
+  tput sgr0
+
+  read -p "domain: " domain_name
+
+  sed -i -e 's/domain_name/'"$domain_name"'/g' k8s/ingress/03-prometheus.ing.yaml
+
+  #Set username and password for basic-auth
+  echo
+  echo -e "${BLUE}Please set the username and password for basic-auth to prometheus and alertmanager:"
+  tput sgr0
+  read -p "Set username [monitor]: " username
+  htpasswd -c auth ${username:-'monitor'}
+
+  #base64 encode the basic-auth and set the secret
+  BASIC_AUTH=$(cat ./auth | base64)
+  sed -i -e 's/htpasswd/'"$BASIC_AUTH"'/g' k8s/ingress/01-basic-auth.secret.yaml
+
+
+  #deploy ingress controller
+  echo
+  echo -e "${BLUE}Deploying  K8S Ingress Controller"
+  tput sgr0
+  kubectl create -f ./k8s/ingress
+
+  #wait for the ingress to become available.
+  echo
+  echo -e "${BLUE}Waiting 10 seconds for the Ingress Controller to become available."
+  tput sgr0
+  sleep 10
+
+  #remove  "sed" generated files
+  rm k8s/ingress/*.yaml-e
+
+  #get ingress IP and hosts, display for user
+  PROM_INGRESS=$(kubectl get ing --namespace=monitoring)
+  echo
+  echo 'Configure "/etc/hosts" or create DNS records for these hosts:' && printf "${RED}$PROM_INGRESS"
+  echo
+
+fi
+
+echo
 #cleanup
 echo -e "${GREEN}Cleaning modified files"
 tput sgr0
@@ -255,12 +297,4 @@ kill $!
 
 # set up proxy for the user
 echo
-read -r -p "Do you want to proxy Grafana to localhost now? [y/N] " response
-if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]
-then
-    echo -e "${ORANGE}You can now access Grafana at http://127.0.0.1:3000"
-    tput sgr0
-    kubectl port-forward $GRAFANA_POD --namespace=monitoring 3000:3000
-else
-    echo -e "${GREEN}Complete"
-fi
+echo -e "${GREEN}Complete"
