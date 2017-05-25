@@ -9,21 +9,21 @@ metadata:
     ingress.kubernetes.io/auth-realm: "Authentication Required"
 spec:
   rules:
-  - host: prometheus.yourdomain.com
+  - host: prometheus.domain_name
     http:
       paths:
       - path: /
         backend:
           serviceName: prometheus
           servicePort: 9090
-  - host: alertmanager.yourdomain.com
+  - host: alertmanager.domain_name
     http:
       paths:
       - path: /
         backend:
           serviceName: alertmanager
           servicePort: 9093
-  - host: grafana.yourdomain.com
+  - host: grafana.domain_name
     http:
       paths:
       - path: /
