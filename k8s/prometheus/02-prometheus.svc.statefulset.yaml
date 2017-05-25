@@ -52,6 +52,12 @@ spec:
           mountPath: /prometheus
         - name: alerts-volume
           mountPath: /etc/alertmanager
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9090
+          initialDelaySeconds: 30
+          timeoutSeconds: 1
       volumes:
       - name: config-volume
         configMap:

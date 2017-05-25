@@ -42,5 +42,11 @@ spec:
         - containerPort: 9100
           hostPort: 9100
           name: scrape
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9100
+          initialDelaySeconds: 30
+          timeoutSeconds: 1
       hostNetwork: true
       hostPID: true

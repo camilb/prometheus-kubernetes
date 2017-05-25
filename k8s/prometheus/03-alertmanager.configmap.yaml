@@ -6,11 +6,11 @@ metadata:
 data:
   config.yml: |-
     global:
-      slack_api_url: 'https://hooks.slack.com/services/your_token'
-      smtp_smarthost: 'your_smtp_host:587'
-      smtp_from: 'prometheus@yourdomain.com'
-      smtp_auth_username: 'your_smtp_username'
-      smtp_auth_password: 'smtp_pass'
+      slack_api_url: 'https://hooks.slack.com/services/your_slack_api_token'
+      smtp_smarthost: 'your_smtp_smarthost:587'
+      smtp_from: 'your_smtp_from'
+      smtp_auth_username: 'your_smtp_user'
+      smtp_auth_password: 'your_smtp_pass'
     templates:
     - '/etc/alertmanager/template/*.tmpl'
     route:
@@ -29,9 +29,9 @@ data:
     receivers:
     - name: 'default-receiver'
       slack_configs:
-      - channel: '#slack_channel'
+      - channel: '#your_slack_channel'
         text: '{{ .Alerts.Firing }}/{{ .GroupLabels.alertname }}/{{ .GroupLabels.SortedPairs.Values }}'
         send_resolved: true
       email_configs:
-      - to: 'alerts@yourdomain.com'
+      - to: 'your_alert_email_address'
         send_resolved: true

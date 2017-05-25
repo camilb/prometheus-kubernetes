@@ -17,3 +17,9 @@ spec:
         ports:
         - containerPort: 8080
         imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          timeoutSeconds: 1
