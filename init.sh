@@ -68,7 +68,7 @@ if [[ $use_smtp =~ ^([yY][eE][sS]|[yY])$ ]]; then
   sed -i -e 's/your_smtp_smarthost/'"$smtp_smarthost"'/g' k8s/prometheus/03-alertmanager.configmap.yaml
   sed -i -e 's/your_smtp_from/'"$smtp_from"'/g' k8s/prometheus/03-alertmanager.configmap.yaml
   sed -i -e 's/your_smtp_user/'"$smtp_user"'/g' k8s/prometheus/03-alertmanager.configmap.yaml
-  sed -i -e 's/your_smtp_pass/'"$smtp_password"'/g' k8s/prometheus/03-alertmanager.configmap.yaml
+  sed -i -e 's,your_smtp_pass,'"$smtp_password"',g' k8s/prometheus/03-alertmanager.configmap.yaml
   sed -i -e 's/your_alert_email_address/'"$alert_email_address"'/g' k8s/prometheus/03-alertmanager.configmap.yaml
 fi
 
