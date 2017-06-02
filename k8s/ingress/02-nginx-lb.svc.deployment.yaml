@@ -1,39 +1,32 @@
-apiVersion: v1
 kind: Service
+apiVersion: v1
 metadata:
-  name: default-http-backend
+  name: nginx-default-backend
   namespace: nginx-ingress
   labels:
-    k8s-app: default-http-backend
+    k8s-addon: ingress-nginx.addons.k8s.io
 spec:
   ports:
   - port: 80
-    targetPort: 8080
-    protocol: TCP
-    name: http
+    targetPort: http
   selector:
-    k8s-app: default-http-backend
+    app: nginx-default-backend
 ---
-apiVersion: extensions/v1beta1
 kind: Deployment
+apiVersion: extensions/v1beta1
 metadata:
-  name: default-http-backend
+  name: nginx-default-backend
   namespace: nginx-ingress
+  labels:
+    k8s-addon: ingress-nginx.addons.k8s.io
 spec:
   replicas: 1
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
-  selector:
-    matchLabels:
-      k8s-app: default-http-backend
   template:
     metadata:
       labels:
-        k8s-app: default-http-backend
+        k8s-addon: ingress-nginx.addons.k8s.io
+        app: nginx-default-backend
     spec:
-      serviceAccountName: default
       terminationGracePeriodSeconds: 60
       containers:
       - name: default-http-backend
@@ -45,9 +38,6 @@ spec:
             scheme: HTTP
           initialDelaySeconds: 30
           timeoutSeconds: 5
-        ports:
-        - containerPort: 8080
-          name: http
         resources:
           limits:
             cpu: 10m
@@ -55,31 +45,74 @@ spec:
           requests:
             cpu: 10m
             memory: 20Mi
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
 ---
-apiVersion: extensions/v1beta1
-kind: Deployment
+kind: ConfigMap
+apiVersion: v1
 metadata:
-  name: nginx-ingress-controller
+  name: ingress-nginx
   namespace: nginx-ingress
   labels:
-    k8s-app: nginx-ingress-lb
+    k8s-addon: ingress-nginx.addons.k8s.io
+data:
+  use-proxy-protocol: "true"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: ingress-nginx
+  namespace: nginx-ingress
+  labels:
+    k8s-addon: ingress-nginx.addons.k8s.io
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: '*'
+spec:
+  type: LoadBalancer
+  loadBalancerSourceRanges:
+  #ntq office
+  - 213.229.148.26/32
+  # qlick
+  - 52.205.50.174/32
+  selector:
+    app: ingress-nginx
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+  - name: https
+    port: 443
+    targetPort: https
+---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: ingress-nginx
+  namespace: nginx-ingress
+  labels:
+    k8s-addon: ingress-nginx.addons.k8s.io
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      k8s-app: nginx-ingress-lb
   template:
     metadata:
       labels:
-        k8s-app: nginx-ingress-lb
-        name: nginx-ingress-lb
+        app: ingress-nginx
+        k8s-addon: ingress-nginx.addons.k8s.io
     spec:
       terminationGracePeriodSeconds: 60
-      hostNetwork: true
       containers:
-      - image: gcr.io/google_containers/nginx-ingress-controller:0.9.0-beta.5
-        name: nginx-ingress-lb
+      - image: gcr.io/google_containers/nginx-ingress-controller:0.9.0-beta.7
+        name: ingress-nginx
         imagePullPolicy: Always
+        ports:
+          - name: http
+            containerPort: 80
+            protocol: TCP
+          - name: https
+            containerPort: 443
+            protocol: TCP
         livenessProbe:
           httpGet:
             path: /healthz
@@ -87,7 +120,6 @@ spec:
             scheme: HTTP
           initialDelaySeconds: 30
           timeoutSeconds: 5
-        # use downward API
         env:
           - name: POD_NAME
             valueFrom:
@@ -97,12 +129,8 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
-        ports:
-        - containerPort: 80
-          hostPort: 80
-        - containerPort: 443
-          hostPort: 443
-        - containerPort: 8080
         args:
         - /nginx-ingress-controller
-        - --default-backend-service=$(POD_NAMESPACE)/default-http-backend
+        - --default-backend-service=$(POD_NAMESPACE)/nginx-default-backend
+        - --configmap=$(POD_NAMESPACE)/ingress-nginx
+        - --publish-service=$(POD_NAMESPACE)/ingress-nginx
