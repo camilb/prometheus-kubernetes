@@ -320,6 +320,7 @@ else
   fi
   #remove  "sed" generated files
   rm k8s/ingress/*.yaml-e
+  rm k8s/kube-state-metrics/*.yaml-e
 fi
 
 
