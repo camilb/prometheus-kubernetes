@@ -89,33 +89,47 @@ if [[ $use_slack =~ ^([yY][eE][sS]|[yY])$ ]]; then
   sed -i -e 's/your_slack_channel/'"$slack_channel"'/g' k8s/prometheus/03-alertmanager.configmap.yaml
 fi
 
-#try to figure out AWS credentials for EC2 monitoring, if not...ask.
-echo
-echo -e "${BLUE}Detecting AWS access keys."
-tput sgr0
-if [ ! -z $AWS_ACCESS_KEY_ID ] && [ ! -z $AWS_SECRET_ACCESS_KEY ]; then
-  aws_access_key=$AWS_ACCESS_KEY_ID
-  aws_secret_key=$AWS_SECRET_ACCESS_KEY
-  echo -e "${ORANGE}AWS_ACCESS_KEY_ID found, using $aws_access_key."
-  tput sgr0
-elif [ ! -z $AWS_ACCESS_KEY ] && [ ! -z $AWS_SECRET_KEY ]; then
-  aws_access_key=$AWS_ACCESS_KEY
-  aws_secret_key=$AWS_SECRET_KEY
-  echo -e "${ORANGE}AWS_ACCESS_KEY found, using $aws_access_key."
-  tput sgr0
-else
-  echo -e "${RED}Unable to determine AWS credetials from environment variables."
-  tput sgr0
-  #aws access key
-  read -p "AWS Access Key ID: " aws_access_key
-  #aws secret access key
-  read -p "AWS Secret Access Key: " aws_secret_key
-fi
 
-#sed in the AWS credentials. this looks odd because aws secret access keys can have '/' as a valid character
-#so we use ',' as a delimiter for sed, since that won't appear in the secret key
-sed -i -e 's/aws_access_key/'"$aws_access_key"'/g' k8s/prometheus/01-prometheus.configmap.yaml
-sed -i -e 's,aws_secret_key,'"$aws_secret_key"',g' k8s/prometheus/01-prometheus.configmap.yaml
+#Do you want to monitor EC2 instances in your AWS account?
+echo
+echo -e "${BLUE}Do you want to monitor EC2 instances in your AWS account?"
+tput sgr0
+read -p "Y/N [N]: " monitor_aws
+
+#if so, fill out this form...
+if [[ $monitor_aws =~ ^([yY][eE][sS]|[yY])$ ]]; then
+
+  #try to figure out AWS credentials for EC2 monitoring, if not...ask.
+  echo
+  echo -e "${BLUE}Detecting AWS access keys."
+  tput sgr0
+  if [ ! -z $AWS_ACCESS_KEY_ID ] && [ ! -z $AWS_SECRET_ACCESS_KEY ]; then
+    aws_access_key=$AWS_ACCESS_KEY_ID
+    aws_secret_key=$AWS_SECRET_ACCESS_KEY
+    echo -e "${ORANGE}AWS_ACCESS_KEY_ID found, using $aws_access_key."
+    tput sgr0
+  elif [ ! -z $AWS_ACCESS_KEY ] && [ ! -z $AWS_SECRET_KEY ]; then
+    aws_access_key=$AWS_ACCESS_KEY
+    aws_secret_key=$AWS_SECRET_KEY
+    echo -e "${ORANGE}AWS_ACCESS_KEY found, using $aws_access_key."
+    tput sgr0
+  else
+    echo -e "${RED}Unable to determine AWS credetials from environment variables."
+    tput sgr0
+    #aws access key
+    read -p "AWS Access Key ID: " aws_access_key
+    #aws secret access key
+    read -p "AWS Secret Access Key: " aws_secret_key
+  fi
+
+  #sed in the AWS credentials. this looks odd because aws secret access keys can have '/' as a valid character
+  #so we use ',' as a delimiter for sed, since that won't appear in the secret key
+  sed -i -e 's/aws_access_key/'"$aws_access_key"'/g' k8s/prometheus/01-prometheus.configmap.yaml
+  sed -i -e 's,aws_secret_key,'"$aws_secret_key"',g' k8s/prometheus/01-prometheus.configmap.yaml
+
+else
+  rm grafana/grafana-dashboards/ec2-instances.json
+fi
 
 echo
 echo -e "${BLUE}Creating ${ORANGE}'monitoring' ${BLUE}namespace."
@@ -130,7 +144,9 @@ read -p "[y/N]: " response
 if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]
 then
     kubectl create -f ./k8s/rbac/01-prometheus-rbac-config.yaml
+    kubectl create -f ./k8s/rbac/03-kube-state-metrics-rbac-config.yaml
     sed -i -e 's/default/'prometheus'/g' k8s/prometheus/02-prometheus.svc.statefulset.yaml
+    sed -i -e 's/default/'kube-state-metrics'/g' k8s/kube-state-metrics/deployment.yaml
 else
     echo -e "${GREEN}Skipping RBAC configuration"
 fi
@@ -304,6 +320,7 @@ else
   fi
   #remove  "sed" generated files
   rm k8s/ingress/*.yaml-e
+  rm k8s/kube-state-metrics/*.yaml-e
 fi
 
 
