@@ -16,8 +16,8 @@ data:
     route:
       group_by: ['alertname', 'cluster', 'service']
       group_wait: 30s
-      group_interval: 1m
-      repeat_interval: 1m
+      group_interval: 5m
+      repeat_interval: 30m
       receiver: default-receiver
     inhibit_rules:
     - source_match:
