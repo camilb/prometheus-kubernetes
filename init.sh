@@ -1,15 +1,20 @@
 #!/bin/bash
-
-GRAFANA_DEFAULT_VERSION=4.3.2
-PROMETHEUS_DEFAULT_VERSION=v2.0.0-beta.0
-ALERT_MANAGER_DEFAULT_VERSION=v0.7.1
+AWS_DEFAULT_AVAILABILITY_ZONE=us-east-1c
+GRAFANA_DEFAULT_VERSION=4.4.3
+PROMETHEUS_DEFAULT_VERSION=v2.0.0-beta.2
+ALERT_MANAGER_DEFAULT_VERSION=v0.8.0
 NODE_EXPORTER_DEFAULT_VERSION=v0.14.0
+KUBE_STATE_METRICS_DEFAULT_VERSION=v1.0.0
 DOCKER_USER_DEFAULT=$(docker info|grep Username:|awk '{print $2}')
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 ORANGE='\033[0;33m'
 BLUE='\033[0;34m'
 PURPLE='\033[0;35m'
+
+#Ask for AWS availability zone
+read -p "Enter your desired availability zone to deploy Prometheus StatefulSet [$AWS_DEFAULT_AVAILABILITY_ZONE]: " AWS_AVAILABILITY_ZONE
+AWS_AVAILABILITY_ZONE=${AWS_AVAILABILITY_ZONE:-$AWS_DEFAULT_AVAILABILITY_ZONE}
 
 #Ask for grafana version or apply default
 echo
@@ -28,6 +33,10 @@ ALERT_MANAGER_VERSION=${ALERT_MANAGER_VERSION:-$ALERT_MANAGER_DEFAULT_VERSION}
 #Ask for node exporter version or apply default
 read -p "Enter Node Exporter version [$NODE_EXPORTER_DEFAULT_VERSION]: " NODE_EXPORTER_VERSION
 NODE_EXPORTER_VERSION=${NODE_EXPORTER_VERSION:-$NODE_EXPORTER_DEFAULT_VERSION}
+
+#Ask for kube-state-metrics version or apply default
+read -p "Enter Kube Stae Metrics version [$KUBE_STATE_METRICS_DEFAULT_VERSION]: " KUBE_STATE_METRICS_VERSION
+KUBE_STATE_METRICS_VERSION=${KUBE_STATE_METRICS_VERSION:-$KUBE_STATE_METRICS_DEFAULT_VERSION}
 
 #Ask for dockerhub user or apply default of the current logged-in username
 read -p "Enter Dockerhub username [$DOCKER_USER_DEFAULT]: " DOCKER_USER
@@ -152,6 +161,9 @@ else
 fi
 tput sgr0
 
+#aws availability zone
+sed -i -e 's/AWS_AVAILABILITY_ZONE/'"$AWS_AVAILABILITY_ZONE"'/g' k8s/prometheus/02-prometheus.svc.statefulset.yaml
+
 #set prometheus version
 sed -i -e 's/PROMETHEUS_VERSION/'"$PROMETHEUS_VERSION"'/g' k8s/prometheus/02-prometheus.svc.statefulset.yaml
 
@@ -165,8 +177,11 @@ sed -i -e 's/ALERT_MANAGER_VERSION/'"$ALERT_MANAGER_VERSION"'/g' k8s/prometheus/
 #set node-exporter version
 sed -i -e 's/NODE_EXPORTER_VERSION/'"$NODE_EXPORTER_VERSION"'/g' k8s/prometheus/05-node-exporter.svc.daemonset.yaml
 
+#set node-exporter version
+sed -i -e 's/KUBE_STATE_METRICS_VERSION/'"$KUBE_STATE_METRICS_VERSION"'/g' k8s/kube-state-metrics/deployment.yaml
+
 #remove  "sed" generated files
-rm k8s/prometheus/*.yaml-e && rm k8s/grafana/*.yaml-e && rm grafana/*-e 2> /dev/null
+rm k8s/prometheus/*.yaml-e && rm k8s/grafana/*.yaml-e && rm grafana/*-e kube-state-metrics/*.yaml-e 2> /dev/null
 
 #build grafana image, push to dockerhub
 echo
