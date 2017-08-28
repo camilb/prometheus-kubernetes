@@ -1,5 +1,5 @@
 #!/bin/bash
-AWS_DEFAULT_AVAILABILITY_ZONE=us-east-1c
+#AWS_DEFAULT_AVAILABILITY_ZONE=us-east-1c
 GRAFANA_DEFAULT_VERSION=4.4.3
 PROMETHEUS_DEFAULT_VERSION=v2.0.0-beta.2
 ALERT_MANAGER_DEFAULT_VERSION=v0.8.0
@@ -13,8 +13,8 @@ BLUE='\033[0;34m'
 PURPLE='\033[0;35m'
 
 #Ask for AWS availability zone
-read -p "Enter your desired availability zone to deploy Prometheus StatefulSet [$AWS_DEFAULT_AVAILABILITY_ZONE]: " AWS_AVAILABILITY_ZONE
-AWS_AVAILABILITY_ZONE=${AWS_AVAILABILITY_ZONE:-$AWS_DEFAULT_AVAILABILITY_ZONE}
+#read -p "Enter your desired availability zone to deploy Prometheus StatefulSet [$AWS_DEFAULT_AVAILABILITY_ZONE]: " AWS_AVAILABILITY_ZONE
+#AWS_AVAILABILITY_ZONE=${AWS_AVAILABILITY_ZONE:-$AWS_DEFAULT_AVAILABILITY_ZONE}
 
 #Ask for grafana version or apply default
 echo
@@ -162,7 +162,7 @@ fi
 tput sgr0
 
 #aws availability zone
-sed -i -e 's/AWS_AVAILABILITY_ZONE/'"$AWS_AVAILABILITY_ZONE"'/g' k8s/prometheus/02-prometheus.svc.statefulset.yaml
+#sed -i -e 's/AWS_AVAILABILITY_ZONE/'"$AWS_AVAILABILITY_ZONE"'/g' k8s/prometheus/02-prometheus.svc.statefulset.yaml
 
 #set prometheus version
 sed -i -e 's/PROMETHEUS_VERSION/'"$PROMETHEUS_VERSION"'/g' k8s/prometheus/02-prometheus.svc.statefulset.yaml
