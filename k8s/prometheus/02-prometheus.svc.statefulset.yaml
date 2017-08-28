@@ -34,6 +34,10 @@ spec:
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 0
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 2000
+        runAsNonRoot: true
       containers:
       - name: prometheus
         image: prom/prometheus:PROMETHEUS_VERSION
