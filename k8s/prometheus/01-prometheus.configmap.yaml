@@ -100,7 +100,10 @@ data:
         target_label: kubernetes_name
 
     - job_name: 'kubernetes-services'
-
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
       metrics_path: /probe
       params:
         module: [http_2xx]

@@ -800,7 +800,7 @@
           },
           "targets": [
             {
-              "expr": "sum(kubelet_running_pod_count{instance=~\"^$Node$\",job=\"kubelets\"})",
+              "expr": "sum(kubelet_running_pod_count{instance=~\"^$Node$\",job=\"kubernetes-nodes\"})",
               "interval": "10s",
               "intervalFactor": 2,
               "legendFormat": "",
@@ -880,7 +880,7 @@
           },
           "targets": [
             {
-              "expr": "sum(kubelet_running_container_count{instance=~\"^$Node$\",job=\"kubelets\"})",
+              "expr": "sum(kubelet_running_container_count{instance=~\"^$Node$\",job=\"kubernetes-nodes\"})",
               "interval": "10s",
               "intervalFactor": 2,
               "legendFormat": "",
@@ -1490,7 +1490,7 @@
             "selected": false
           }
         ],
-        "query": "label_values(kubelet_running_pod_count{job=\"kubelets\"}, instance)",
+        "query": "label_values(kubelet_running_pod_count{job=\"kubernetes-nodes\"}, instance)",
         "refresh": 1,
         "regex": "",
         "type": "query"
