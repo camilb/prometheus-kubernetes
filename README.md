@@ -1,5 +1,8 @@
 # Monitoring Kubernetes  clusters on AWS using Prometheus
 
+
+[![asciicast](https://asciinema.org/a/QdIFKxowJ9XOSpS9QYuGI23J5.png)](https://asciinema.org/a/QdIFKxowJ9XOSpS9QYuGI23J5)
+
 ## Configuration
 
 * A new namespace is created named `monitoring`

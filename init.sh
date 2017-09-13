@@ -35,7 +35,7 @@ read -p "Enter Node Exporter version [$NODE_EXPORTER_DEFAULT_VERSION]: " NODE_EX
 NODE_EXPORTER_VERSION=${NODE_EXPORTER_VERSION:-$NODE_EXPORTER_DEFAULT_VERSION}
 
 #Ask for kube-state-metrics version or apply default
-read -p "Enter Kube Stae Metrics version [$KUBE_STATE_METRICS_DEFAULT_VERSION]: " KUBE_STATE_METRICS_VERSION
+read -p "Enter Kube State Metrics version [$KUBE_STATE_METRICS_DEFAULT_VERSION]: " KUBE_STATE_METRICS_VERSION
 KUBE_STATE_METRICS_VERSION=${KUBE_STATE_METRICS_VERSION:-$KUBE_STATE_METRICS_DEFAULT_VERSION}
 
 #Ask for dockerhub user or apply default of the current logged-in username
@@ -147,7 +147,7 @@ tput sgr0
 kubectl create namespace monitoring
 
 echo
-echo -e "${BLUE}Is the RBAC plugin enabled?"
+echo -e "${BLUE}Using RBAC?"
 tput sgr0
 read -p "[y/N]: " response
 if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]
@@ -232,9 +232,10 @@ echo
 
 echo
 #cleanup
-echo -e "${GREEN}Removing the changes made"
+echo -e "${BLUE}Removing local changes"
 ./cleanup.sh
 tput sgr0
+sleep 5
 
 GRAFANA_POD=$(kubectl get pods --namespace=monitoring | grep grafana | cut -d ' ' -f 1)
 
@@ -243,7 +244,7 @@ GRAFANA_POD=$(kubectl get pods --namespace=monitoring | grep grafana | cut -d ' 
 
 kubectl port-forward $GRAFANA_POD --namespace=monitoring 3000:3000 > /dev/null 2>&1 &
 
-echo -e "${GREEN}Importing Prometheus datasource."
+echo -e "${ORANGE}Importing Prometheus datasource."
 tput sgr0
 sleep 5
 curl 'http://admin:admin@127.0.0.1:3000/api/datasources' -X POST -H 'Content-Type: application/json;charset=UTF-8' --data-binary '{"name":"prometheus.monitoring.svc.cluster.local","type":"prometheus","url":"http://prometheus.monitoring.svc.cluster.local:9090","access":"proxy","isDefault":true}' 2> /dev/null 2>&1
@@ -259,4 +260,5 @@ kill $!
 
 # set up proxy for the user
 echo
-echo -e "${GREEN}Complete"
+echo -e "${GREEN}Done"
+tput sgr0
