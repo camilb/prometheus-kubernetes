@@ -71,11 +71,9 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: '*'
 spec:
   type: LoadBalancer
-  loadBalancerSourceRanges:
-  #ntq office
-  - 213.229.148.26/32
-  # qlick
-  - 52.205.50.174/32
+  #loadBalancerSourceRanges:
+  #- 8.8.8.8
+  #- 8.8.4.4
   selector:
     app: ingress-nginx
   ports:
@@ -106,7 +104,7 @@ spec:
     spec:
       terminationGracePeriodSeconds: 60
       containers:
-      - image: gcr.io/google_containers/nginx-ingress-controller:0.9.0-beta.12
+      - image: gcr.io/google_containers/nginx-ingress-controller:0.9.0-beta.13
         name: ingress-nginx
         imagePullPolicy: Always
         ports:

@@ -76,7 +76,7 @@ data:
            labels:
              quantile: "0.5"
          - alert: K8SNodeDown
-           expr: up{job="kubelets"} == 0
+           expr: up{job="node-exporter"} == 0
            for: 5m
            labels:
              service: k8s
@@ -124,8 +124,8 @@ data:
                hour.
              summary: Kubelet node_exporter cannot be scraped
          - alert: K8SKubeletDown
-           expr: absent(up{job="kubelets"}) or count(up{job="kubelets"} == 0) BY (cluster)
-             / count(up{job="kubelets"}) BY (cluster) > 0.1
+           expr: absent(up{job="node-exporter"}) or count(up{job="node-exporter"} == 0) BY (cluster)
+             / count(up{job="node-exporter"}) BY (cluster) > 0.1
            for: 5m
            labels:
              service: k8s
