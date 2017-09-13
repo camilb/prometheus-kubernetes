@@ -210,6 +210,14 @@ echo -e "${ORANGE}Deploying Grafana"
 tput sgr0
 kubectl create -f k8s/grafana
 
+
+#remove Cadvisor configuration from Prometheus configmap for older kubernetes versions.
+KUBERNETES_VERSION=$(kubectl version | grep Server | grep Minor | cut -d "," -f 2 | cut -d ":" -f 2 | tr -d '"')
+if [ $KUBERNETES_VERSION -ge 7 ];
+ then true;
+else sed -i  -e '51,70d' ./k8s/prometheus/01-prometheus.configmap.yaml;
+fi
+
 #deploy prometheus
 echo
 echo -e "${ORANGE}Deploying Prometheus"
@@ -336,6 +344,7 @@ else
   #remove  "sed" generated files
   rm k8s/ingress/*.yaml-e
   rm k8s/kube-state-metrics/*.yaml-e
+  rm k8s/prometheus/*.yaml-e
 fi
 
 
