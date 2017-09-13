@@ -3,7 +3,7 @@
 
 ![alt](https://www.camil.org/content/images/2017/cluster.png)
 
-One minute deployment
+## One minute deployment
 [![asciicast](https://asciinema.org/a/QdIFKxowJ9XOSpS9QYuGI23J5.png)](https://asciinema.org/a/QdIFKxowJ9XOSpS9QYuGI23J5)
 
 ## Configuration
