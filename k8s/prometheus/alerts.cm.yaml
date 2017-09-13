@@ -1,0 +1,243 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alerts
+  namespace: monitoring
+data:
+  kubernetes.rules: |-
+       groups:
+       - name: kubernetes.rules
+         rules:
+         - record: cluster_namespace_controller_pod_container:spec_memory_limit_bytes
+           expr: sum(label_replace(container_spec_memory_limit_bytes{container_name!=""},
+             "controller", "$1", "pod_name", "^(.*)-[a-z0-9]+")) BY (cluster, namespace,
+             controller, pod_name, container_name)
+         - record: cluster_namespace_controller_pod_container:spec_cpu_shares
+           expr: sum(label_replace(container_spec_cpu_shares{container_name!=""}, "controller",
+             "$1", "pod_name", "^(.*)-[a-z0-9]+")) BY (cluster, namespace, controller, pod_name,
+             container_name)
+         - record: cluster_namespace_controller_pod_container:cpu_usage:rate
+           expr: sum(label_replace(irate(container_cpu_usage_seconds_total{container_name!=""}[5m]),
+             "controller", "$1", "pod_name", "^(.*)-[a-z0-9]+")) BY (cluster, namespace,
+             controller, pod_name, container_name)
+         - record: cluster_namespace_controller_pod_container:memory_usage:bytes
+           expr: sum(label_replace(container_memory_usage_bytes{container_name!=""}, "controller",
+             "$1", "pod_name", "^(.*)-[a-z0-9]+")) BY (cluster, namespace, controller, pod_name,
+             container_name)
+         - record: cluster_namespace_controller_pod_container:memory_working_set:bytes
+           expr: sum(label_replace(container_memory_working_set_bytes{container_name!=""},
+             "controller", "$1", "pod_name", "^(.*)-[a-z0-9]+")) BY (cluster, namespace,
+             controller, pod_name, container_name)
+         - record: cluster_namespace_controller_pod_container:memory_rss:bytes
+           expr: sum(label_replace(container_memory_rss{container_name!=""}, "controller",
+             "$1", "pod_name", "^(.*)-[a-z0-9]+")) BY (cluster, namespace, controller, pod_name,
+             container_name)
+         - record: cluster_namespace_controller_pod_container:memory_cache:bytes
+           expr: sum(label_replace(container_memory_cache{container_name!=""}, "controller",
+             "$1", "pod_name", "^(.*)-[a-z0-9]+")) BY (cluster, namespace, controller, pod_name,
+             container_name)
+         - record: cluster_namespace_controller_pod_container:disk_usage:bytes
+           expr: sum(label_replace(container_disk_usage_bytes{container_name!=""}, "controller",
+             "$1", "pod_name", "^(.*)-[a-z0-9]+")) BY (cluster, namespace, controller, pod_name,
+             container_name)
+         - record: cluster_namespace_controller_pod_container:memory_pagefaults:rate
+           expr: sum(label_replace(irate(container_memory_failures_total{container_name!=""}[5m]),
+             "controller", "$1", "pod_name", "^(.*)-[a-z0-9]+")) BY (cluster, namespace,
+             controller, pod_name, container_name, scope, type)
+         - record: cluster_namespace_controller_pod_container:memory_oom:rate
+           expr: sum(label_replace(irate(container_memory_failcnt{container_name!=""}[5m]),
+             "controller", "$1", "pod_name", "^(.*)-[a-z0-9]+")) BY (cluster, namespace,
+             controller, pod_name, container_name, scope, type)
+         - record: cluster:memory_allocation:percent
+           expr: 100 * sum(container_spec_memory_limit_bytes{pod_name!=""}) BY (cluster)
+             / sum(machine_memory_bytes) BY (cluster)
+         - record: cluster:memory_used:percent
+           expr: 100 * sum(container_memory_usage_bytes{pod_name!=""}) BY (cluster) / sum(machine_memory_bytes)
+             BY (cluster)
+         - record: cluster:cpu_allocation:percent
+           expr: 100 * sum(container_spec_cpu_shares{pod_name!=""}) BY (cluster) / sum(container_spec_cpu_shares{id="/"}
+             * ON(cluster, instance) machine_cpu_cores) BY (cluster)
+         - record: cluster:node_cpu_use:percent
+           expr: 100 * sum(rate(node_cpu{mode!="idle"}[5m])) BY (cluster) / sum(machine_cpu_cores)
+             BY (cluster)
+         - record: cluster_resource_verb:apiserver_latency:quantile_seconds
+           expr: histogram_quantile(0.99, sum(apiserver_request_latencies_bucket) BY (le,
+             cluster, job, resource, verb)) / 1e+06
+           labels:
+             quantile: "0.99"
+         - record: cluster_resource_verb:apiserver_latency:quantile_seconds
+           expr: histogram_quantile(0.9, sum(apiserver_request_latencies_bucket) BY (le,
+             cluster, job, resource, verb)) / 1e+06
+           labels:
+             quantile: "0.9"
+         - record: cluster_resource_verb:apiserver_latency:quantile_seconds
+           expr: histogram_quantile(0.5, sum(apiserver_request_latencies_bucket) BY (le,
+             cluster, job, resource, verb)) / 1e+06
+           labels:
+             quantile: "0.5"
+         - alert: K8SNodeDown
+           expr: up{app="node-exporter"} == 0
+           for: 5m
+           labels:
+             service: k8s
+             severity: warning
+           annotations:
+             description: Prometheus could not scrape a {{ $labels.job }} for more than one
+               hour
+             summary: Kubelet cannot be scraped
+         - alert: K8SNodeNotReady
+           expr: kube_node_status_ready{condition="true"} == 0
+           for: 15m
+           labels:
+             service: k8s
+             severity: warning
+           annotations:
+             description: The Kubelet on {{ $labels.node }} has not checked in with the API,
+               or has set itself to NotReady, for more than an hour
+             summary: Node status is NotReady
+         - alert: K8SManyNodesNotReady
+           expr: count(kube_node_status_ready{condition="true"} == 0) BY (cluster) > 1 and
+             (count(kube_node_status_ready{condition="true"} == 0) BY (cluster) / count(kube_node_status_ready{condition="true"})
+             BY (cluster)) > 0.2
+           for: 1m
+           labels:
+             service: k8s
+             severity: critical
+           annotations:
+             description: '{{ $value }} K8s nodes (more than 10% of cluster {{ $labels.cluster
+               }}) are in the NotReady state.'
+             summary: Many K8s nodes are Not Ready
+         - alert: HighDiskUsage
+           expr: node_filesystem_free{device="/dev/xvda1"} < node_filesystem_size / 10
+           for: 1m
+           annotations:
+             description: '{{ $labels.instance }} has less than 10% of free disk space'
+             summary: Low disk space on {{ $labels.instance }}
+         - alert: K8SKubeletNodeExporterDown
+           expr: up{app="node-exporter"} == 0
+           for: 15m
+           labels:
+             service: k8s
+             severity: warning
+           annotations:
+             description: Prometheus could not scrape a {{ $labels.job }} for more than one
+               hour.
+             summary: Kubelet node_exporter cannot be scraped
+         - alert: K8SKubeletDown
+           expr: absent(up{app="node-exporter"}) or count(up{app="node-exporter"} == 0) BY (cluster)
+             / count(up{app="node-exporter"}) BY (cluster) > 0.1
+           for: 5m
+           labels:
+             service: k8s
+             severity: critical
+           annotations:
+             description: Prometheus failed to scrape more than 10% of kubelets, or all Kubelets
+               have disappeared from service discovery.
+             summary: Many Kubelets cannot be scraped
+         - alert: K8SApiserverDown
+           expr: up{job="kubernetes"} == 0
+           for: 10m
+           labels:
+             service: k8s
+             severity: warning
+           annotations:
+             description: An API server could not be scraped.
+             summary: API server unreachable
+         - alert: K8SApiserverDown
+           expr: absent({job="kubernetes"}) or (count(up{job="kubernetes"} == 1) BY (cluster)
+             < count(up{job="kubernetes"}) BY (cluster))
+           for: 5m
+           labels:
+             service: k8s
+             severity: critical
+           annotations:
+             description: Prometheus failed to scrape multiple API servers, or all API servers
+               have disappeared from service discovery.
+             summary: API server unreachable
+         - alert: K8SConntrackTableFull
+           expr: 100 * node_nf_conntrack_entries / node_nf_conntrack_entries_limit > 50
+           for: 10m
+           labels:
+             service: k8s
+             severity: warning
+           annotations:
+             description: The nf_conntrack table is {{ $value }}% full.
+             summary: Number of tracked connections is near the limit
+         - alert: K8SConntrackTableFull
+           expr: 100 * node_nf_conntrack_entries / node_nf_conntrack_entries_limit > 90
+           labels:
+             service: k8s
+             severity: critical
+           annotations:
+             description: The nf_conntrack table is {{ $value }}% full.
+             summary: Number of tracked connections is near the limit
+         - alert: K8SConntrackTuningMissing
+           expr: node_nf_conntrack_udp_timeout > 10
+           for: 10m
+           labels:
+             service: k8s
+             severity: warning
+           annotations:
+             description: Nodes keep un-setting the correct tunings, investigate when it
+               happens.
+             summary: Node does not have the correct conntrack tunings
+         - alert: K8STooManyOpenFiles
+           expr: 100 * process_open_fds{job=~"^(?:kubelets|kubernetes)$"} / process_max_fds
+             > 50
+           for: 10m
+           labels:
+             service: k8s
+             severity: warning
+           annotations:
+             description: '{{ $labels.node }} is using {{ $value }}% of the available file/socket
+               descriptors.'
+             summary: '{{ $labels.job }} has too many open file descriptors'
+         - alert: K8STooManyOpenFiles
+           expr: 100 * process_open_fds{job=~"^(?:kubelets|kubernetes)$"} / process_max_fds
+             > 80
+           for: 10m
+           labels:
+             service: k8s
+             severity: critical
+           annotations:
+             description: '{{ $labels.node }} is using {{ $value }}% of the available file/socket
+               descriptors.'
+             summary: '{{ $labels.job }} has too many open file descriptors'
+         - alert: K8SApiServerLatency
+           expr: histogram_quantile(0.99, sum(apiserver_request_latencies_bucket{verb!~"^(?:CONNECT|WATCHLIST|WATCH)$"})
+             WITHOUT (instance, node, resource)) / 1e+06 > 9
+           for: 10m
+           labels:
+             service: k8s
+             severity: warning
+           annotations:
+             description: 99th percentile Latency for {{ $labels.verb }} requests to the
+               kube-apiserver is higher than 1s.
+             summary: Kubernetes apiserver latency is high
+         - alert: K8SApiServerEtcdAccessLatency
+           expr: etcd_request_latencies_summary{quantile="0.99"} / 1e+06 > 1
+           for: 15m
+           labels:
+             service: k8s
+             severity: warning
+           annotations:
+             description: 99th percentile latency for apiserver to access etcd is higher
+               than 1s.
+             summary: Access to etcd is slow
+         - alert: K8SKubeletTooManyPods
+           expr: kubelet_running_pod_count > 100
+           labels:
+             service: k8s
+             severity: warning
+           annotations:
+             description: Kubelet {{$labels.instance}} is running {{$value}} pods, close
+               to the limit of 110
+             summary: Kubelet is close to pod limit
+         - alert: PodRestartingTooMuch
+           expr: rate(kube_pod_container_status_restarts[10m]) * 600 > 2
+           for: 5m
+           labels:
+             severity: warning
+           annotations:
+             description: Pod {{$labels.namespace}}/{{$label.name}} restarting too much.
+             summary: Pod {{$labels.namespace}}/{{$label.name}} restarting too much.
