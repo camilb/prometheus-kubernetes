@@ -1,3 +1,3 @@
 git checkout  k8s/*
 git checkout  grafana/*
-rm auth
+git checkout  k8s/kube-state-metrics/*

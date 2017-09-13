@@ -34,21 +34,24 @@ spec:
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 0
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 2000
+        runAsNonRoot: true
       containers:
-      - name: prometheus-prom-1
+      - name: prometheus
         image: prom/prometheus:PROMETHEUS_VERSION
         args:
-          - '-storage.local.retention=720h'
-          - '-storage.local.memory-chunks=500000'
-          - '-config.file=/etc/prometheus/prometheus.yml'
-          - '-alertmanager.url=http://alertmanager:9093'
+          - '--storage.tsdb.path="/prometheus/data/"'
+          - '--storage.tsdb.retention=15d'
+          - '--config.file=/etc/prometheus/prometheus.yml'
         ports:
         - name: web
           containerPort: 9090
         volumeMounts:
         - name: config-volume
           mountPath: /etc/prometheus
-        - name: prometheus-prom-1
+        - name: prometheus
           mountPath: /prometheus
         - name: alerts-volume
           mountPath: /etc/alertmanager
@@ -67,11 +70,18 @@ spec:
           name: alerts
   volumeClaimTemplates:
   - metadata:
-      name: prometheus-prom-1
-      annotations:
-        volume.alpha.kubernetes.io/storage-class: ebs
+      name: prometheus
     spec:
       accessModes: [ "ReadWriteOnce" ]
+      storageClassName: standard
       resources:
         requests:
           storage: 20Gi
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: standard
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2

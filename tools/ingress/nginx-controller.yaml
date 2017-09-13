@@ -71,11 +71,9 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: '*'
 spec:
   type: LoadBalancer
-  loadBalancerSourceRanges:
-  #ntq office
-  - 213.229.148.26/32
-  # qlick
-  - 52.205.50.174/32
+  #loadBalancerSourceRanges:
+  #- 8.8.8.8
+  #- 8.8.4.4
   selector:
     app: ingress-nginx
   ports:
@@ -93,6 +91,9 @@ metadata:
   namespace: nginx-ingress
   labels:
     k8s-addon: ingress-nginx.addons.k8s.io
+  annotations:
+    prometheus.io/port: '10254'
+    prometheus.io/scrape: 'true'
 spec:
   replicas: 1
   template:
@@ -103,7 +104,7 @@ spec:
     spec:
       terminationGracePeriodSeconds: 60
       containers:
-      - image: gcr.io/google_containers/nginx-ingress-controller:0.9.0-beta.7
+      - image: gcr.io/google_containers/nginx-ingress-controller:0.9.0-beta.13
         name: ingress-nginx
         imagePullPolicy: Always
         ports:
