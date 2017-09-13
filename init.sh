@@ -180,7 +180,7 @@ sed -i -e 's/NODE_EXPORTER_VERSION/'"$NODE_EXPORTER_VERSION"'/g' k8s/prometheus/
 sed -i -e 's/KUBE_STATE_METRICS_VERSION/'"$KUBE_STATE_METRICS_VERSION"'/g' k8s/kube-state-metrics/ksm.de.yaml
 
 #remove  "sed" generated files
-rm k8s/prometheus/*.yaml-e && rm k8s/grafana/*-e && rm grafana/*.yaml-e && rm k8s/kube-state-metrics/*.yaml-e 2> /dev/null
+rm k8s/prometheus/*.yaml-e && rm k8s/grafana/*.yaml-e && rm grafana/*-e && rm k8s/kube-state-metrics/*.yaml-e 2> /dev/null
 
 #build grafana image, push to dockerhub
 echo
