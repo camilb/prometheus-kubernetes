@@ -3,8 +3,7 @@
 ## Configuration
 
 * A new namespace is created named `monitoring`
-* Prometheus is deployed in a `StatefulSet` with external EBS disk attached to pod for data storage
-* Nginx Ingress Controller to access the dashboards
+* Prometheus is deployed using a `StatefulSet` with external EBS disk attached to the pod for data storage
 
 ![alt](https://www.camil.org/content/images/2016/10/prom-1.png)
 
@@ -23,25 +22,16 @@ Clone repository
 
     git clone github.com/camilb/prometheus-kubernetes && cd prometehus-kubernetes
 
-Make any desired configration changes in `configmaps` according to your setup.
-* ./k8s/prometheus/01-prometheus.configmap.yaml
-* ./k8s/prometheus/03-alertmanager.configmap.yaml
+Make any desired configuration changes in `configmaps` according to your setup.
+* ./k8s/prometheus/prometheus.cm.yaml
+* ./k8s/prometheus/alertmanager.cm.yaml
 
 
-## Deploy Prometheus with Grafana
+## Deploy Prometheus, Alertmaneger, Node Exporter, Grafana and Kube State Metrics
 
     ./init.sh
 
-* The init script will ask some basic questions and attempt to autodiscover information about your system. 
-
-* Configure "/etc/hosts" or create DNS records with the hosts and IP from the Ingress Controller.
-
-   You can always get the Ingress Controller configuration by running:
-
-        kubectl get ing -n monitoring
-
-* The script will ask to perform a cleanup, removing the sensitive data from k8s config files. The changes can be kept locally and erased later using `cleanup.sh` script.
+* The init script will ask some basic questions and attempt to auto-discover information about your system.
 
 
-
-You can now access the Grafana and Prometheus dashboards
+Now you can access the dashboards locally using `kubectl port-forward`command, creating a ingress or a LoadBalancer. Please check the `./tools` directory if to quickly configure a ingress or proxy the services to localhost.

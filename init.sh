@@ -232,17 +232,9 @@ echo
 
 echo
 #cleanup
-echo -e "${GREEN}Cleaning modified files"
+echo -e "${GREEN}Removing the changes made"
+./cleanup.sh
 tput sgr0
-
-read -r -p "Remove the changes made? [y/N] " response
-if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]
-then
-    ./cleanup.sh
-else
-    echo -e "${RED}No cleanup was perfromed. Please consider removing the sensitive data in files before pushing changes to ${ORANGE}GitHUB"
-fi
-echo
 
 GRAFANA_POD=$(kubectl get pods --namespace=monitoring | grep grafana | cut -d ' ' -f 1)
 
