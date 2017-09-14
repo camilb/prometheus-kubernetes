@@ -1,6 +1,6 @@
 #!/bin/bash
 #AWS_DEFAULT_AVAILABILITY_ZONE=us-east-1c
-GRAFANA_DEFAULT_VERSION=4.5.0-beta1
+GRAFANA_DEFAULT_VERSION=4.5.0
 PROMETHEUS_DEFAULT_VERSION=v2.0.0-beta.3
 ALERT_MANAGER_DEFAULT_VERSION=v0.8.0
 NODE_EXPORTER_DEFAULT_VERSION=v0.14.0
@@ -179,9 +179,6 @@ sed -i -e 's/NODE_EXPORTER_VERSION/'"$NODE_EXPORTER_VERSION"'/g' k8s/prometheus/
 #set node-exporter version
 sed -i -e 's/KUBE_STATE_METRICS_VERSION/'"$KUBE_STATE_METRICS_VERSION"'/g' k8s/kube-state-metrics/ksm.de.yaml
 
-#remove  "sed" generated files
-rm k8s/prometheus/*.yaml-e && rm k8s/grafana/*.yaml-e && rm grafana/*-e && rm k8s/kube-state-metrics/*.yaml-e 2> /dev/null
-
 #build grafana image, push to dockerhub
 echo
 echo -e "${BLUE}Building Grafana Docker image and pushing to dockerhub"
@@ -209,6 +206,12 @@ echo -e "${ORANGE}Deploying Grafana"
 tput sgr0
 kubectl apply -f k8s/grafana
 
+#Fix for kubernetes v1.7 < v1.7.2
+
+KUBERNETES_VERSION=$(kubectl version --short | grep Server)
+if [[ $KUBERNETES_VERSION == "Server Version: v1.7.0" ]] || [[ $KUBERNETES_VERSION == "Server Version: v1.7.0" ]] || [[ $KUBERNETES_VERSION == "Server Version: v1.7.1" ]] ; then
+sed -i -e 's/\/api\/v1\/nodes\/\${1}\/proxy\/metrics\/cadvisor/\/api\/v1\/nodes\/\$\{1\}\:4194\/proxy\/metrics/g' k8s/prometheus/prometheus.cm.yaml
+fi
 
 #remove Cadvisor configuration from Prometheus configmap for older kubernetes versions.
 KUBERNETES_VERSION=$(kubectl version | grep Server | grep Minor | cut -d "," -f 2 | cut -d ":" -f 2 | tr -d '"')
@@ -233,9 +236,32 @@ echo
 echo
 #cleanup
 echo -e "${BLUE}Removing local changes"
+echo
+#remove  "sed" generated files
+rm k8s/prometheus/*.yaml-e && rm k8s/grafana/*.yaml-e && rm grafana/*-e && rm k8s/kube-state-metrics/*.yaml-e 2> /dev/null
 ./cleanup.sh
+
+echo -e "${BLUE}Done"
+echo
 tput sgr0
-sleep 5
+
+#Check if the Grafana pod is ready
+
+while :
+do
+   echo -e "${BLUE}Waiting for Grafana pod to become ready"
+   tput sgr0
+   sleep 2
+   echo
+   if kubectl get pods -n monitoring | grep grafana | grep Running
+   then
+   break
+else
+   echo
+   tput sgr0
+   fi
+done
+
 
 GRAFANA_POD=$(kubectl get pods --namespace=monitoring | grep grafana | cut -d ' ' -f 1)
 
@@ -244,21 +270,22 @@ GRAFANA_POD=$(kubectl get pods --namespace=monitoring | grep grafana | cut -d ' 
 
 kubectl port-forward $GRAFANA_POD --namespace=monitoring 3000:3000 > /dev/null 2>&1 &
 
+echo
 echo -e "${ORANGE}Importing Prometheus datasource."
 tput sgr0
-sleep 5
+sleep 2
 curl 'http://admin:admin@127.0.0.1:3000/api/datasources' -X POST -H 'Content-Type: application/json;charset=UTF-8' --data-binary '{"name":"prometheus.monitoring.svc.cluster.local","type":"prometheus","url":"http://prometheus.monitoring.svc.cluster.local:9090","access":"proxy","isDefault":true}' 2> /dev/null 2>&1
+echo
 
 #check datasources
 echo
 echo -e "${GREEN}Checking datasource"
 tput sgr0
 curl 'http://admin:admin@127.0.0.1:3000/api/datasources' 2> /dev/null 2>&1
-
+echo
 # kill the backgrounded proxy process
 kill $!
 
 # set up proxy for the user
 echo
 echo -e "${GREEN}Done"
-tput sgr0
