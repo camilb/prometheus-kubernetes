@@ -6,7 +6,7 @@
 ## Features
 * Prometheus v2.X.X
 * InCluster deployment using a `StatefulSet` for persistent storage
-* auto-discovery for services and pods annotated with `prometheus.io/scrape: `'true'`
+* auto-discovery for services and pods annotated with `prometheus.io/scrape: 'true'`
 * automatic configuration for RBAC
 * preconfigured alerts
 * preconfigured Grafana dashboards
