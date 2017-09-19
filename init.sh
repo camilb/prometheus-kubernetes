@@ -5,6 +5,7 @@ PROMETHEUS_DEFAULT_VERSION=v2.0.0-beta.3
 ALERT_MANAGER_DEFAULT_VERSION=v0.8.0
 NODE_EXPORTER_DEFAULT_VERSION=v0.14.0
 KUBE_STATE_METRICS_DEFAULT_VERSION=v1.0.1
+DOCKER_REGISTRY_DEFAULT=docker.io
 DOCKER_USER_DEFAULT=$(docker info|grep Username:|awk '{print $2}')
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -38,12 +39,20 @@ NODE_EXPORTER_VERSION=${NODE_EXPORTER_VERSION:-$NODE_EXPORTER_DEFAULT_VERSION}
 read -p "Enter Kube State Metrics version [$KUBE_STATE_METRICS_DEFAULT_VERSION]: " KUBE_STATE_METRICS_VERSION
 KUBE_STATE_METRICS_VERSION=${KUBE_STATE_METRICS_VERSION:-$KUBE_STATE_METRICS_DEFAULT_VERSION}
 
+#Ask for docker registry
+read -p "Enter your Docker registry [$DOCKER_REGISTRY_DEFAULT]: " DOCKER_REGISTRY
+DOCKER_REGISTRY=${DOCKER_REGISTRY:-$DOCKER_REGISTRY_DEFAULT}
+
 #Ask for dockerhub user or apply default of the current logged-in username
-read -p "Enter Dockerhub username [$DOCKER_USER_DEFAULT]: " DOCKER_USER
+read -p "Enter your Docker Registry username [$DOCKER_USER_DEFAULT]: " DOCKER_USER
 DOCKER_USER=${DOCKER_USER:-$DOCKER_USER_DEFAULT}
 
 #Replace Dockerhub username in grafana deployment.
-sed -i -e 's/DOCKER_USER/'"$DOCKER_USER"'/g' k8s/grafana/grafana.svc.de.yaml
+if [[ $DOCKER_REGISTRY != "docker.io" ]]; then
+  sed -i -e 's/DOCKER_USER/'"$DOCKER_REGISTRY\/$DOCKER_USER"'/g' k8s/grafana/grafana.svc.de.yaml
+else
+  sed -i -e 's/DOCKER_USER/'"$DOCKER_USER"'/g' k8s/grafana/grafana.svc.de.yaml
+fi
 
 #Do you want to set up an SMTP relay?
 echo
@@ -183,15 +192,15 @@ sed -i -e 's/KUBE_STATE_METRICS_VERSION/'"$KUBE_STATE_METRICS_VERSION"'/g' k8s/k
 echo
 echo -e "${BLUE}Building Grafana Docker image and pushing to dockerhub"
 tput sgr0
-docker build -t $DOCKER_USER/grafana:$GRAFANA_VERSION ./grafana --no-cache
-docker push $DOCKER_USER/grafana:$GRAFANA_VERSION
+docker build -t $DOCKER_REGISTRY/$DOCKER_USER/grafana:$GRAFANA_VERSION ./grafana --no-cache
+docker push $DOCKER_REGISTRY/$DOCKER_USER/grafana:$GRAFANA_VERSION
 #upon failure, run docker login
 if [ $? -eq 1 ];then
   echo -e "${RED}docker push failed! perhaps you need to login \"${DOCKER_USER}\" to dockerhub?"
   tput sgr0
-  docker login -u $DOCKER_USER
+  docker login -u $DOCKER_USER $DOCKER_REGISTRY
   #try again
-  docker push $DOCKER_USER/grafana:$GRAFANA_VERSION
+  docker push $DOCKER_REGISTRY/$DOCKER_USER/grafana:$GRAFANA_VERSION
   if [ $? -eq 1 ];then
     echo -e "${RED}docker push failed a second time! exiting."
     ./cleanup.sh
