@@ -48,12 +48,18 @@ if [[ $deploy_nginx_ingress =~ ^([yY][eE][sS]|[yY])$ ]]; then
   BASIC_AUTH=$(cat ./auth | base64)
   sed -i -e 's/htpasswd/'"$BASIC_AUTH"'/g' ./basic-auth.secret.yaml
 
-
   #deploy ingress controller
   echo
   echo -e "${BLUE}Deploying  K8S Ingress Controller"
   tput sgr0
   kubectl apply -f ./nginx-controller.yaml
+
+  #ingress
+  echo
+  echo -e "${BLUE}Deploying  K8S Ingress Controller"
+  tput sgr0
+  kubectl apply -f ./basic-auth.secret.yaml
+  kubectl apply -f ./ingress.yaml
 
   #wait for the ingress to become available.
   echo
@@ -94,31 +100,11 @@ else
     BASIC_AUTH=$(cat ./auth | base64)
     sed -i -e 's/htpasswd/'"$BASIC_AUTH"'/g' ./basic-auth.secret.yaml
 
-
-    #deploy ingress controller
-    echo
-    echo -e "${BLUE}Deploying  K8S Ingress Controller"
-    tput sgr0
-    kubectl apply -f ./basic-auth.secret.yaml
-    kubectl apply -f ./ingress.yaml
-
-    #wait for the ingress to become available.
-    echo
-    echo -e "${BLUE}Waiting 10 seconds for the Ingress Controller to become available."
-    tput sgr0
-    sleep 10
-
-    #get ingress IP and hosts, display for user
-    PROM_INGRESS=$(kubectl get ing --namespace=monitoring)
-    echo
-    echo 'Configure "/etc/hosts" or create DNS records for these hosts:' && printf "${RED}$PROM_INGRESS"
-    echo
-
   fi
-  #remove  "sed" generated files
-  rm ./*.yaml-e
 fi
 
+#remove  "sed" generated files
+rm ./*.yaml-e
 
 echo
 #cleanup
