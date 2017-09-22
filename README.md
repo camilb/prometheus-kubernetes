@@ -13,6 +13,9 @@
 * easy to setup; usually less than a minute to deploy a basic monitoring solution for Kubernetes
 * support for Kubernetes v1.6.0 and up
 
+
+If you prefer a much advanced monitoring solution based on [Prometheus Operator](https://github.com/coreos/prometheus-operator) please check the `./operator` directory.
+
 ## One minute deployment
 [![asciicast](https://asciinema.org/a/QdIFKxowJ9XOSpS9QYuGI23J5.png)](https://asciinema.org/a/QdIFKxowJ9XOSpS9QYuGI23J5)
 
