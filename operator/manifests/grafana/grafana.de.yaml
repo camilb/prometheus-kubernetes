@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: grafana
-        image: grafana/grafana:4.4.1
+        image: grafana/grafana:GRAFANA_VERSION
         env:
         - name: GF_AUTH_BASIC_ENABLED
           value: "true"

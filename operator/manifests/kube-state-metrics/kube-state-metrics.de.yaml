@@ -12,7 +12,7 @@ spec:
       serviceAccountName: kube-state-metrics
       containers:
       - name: kube-state-metrics
-        image: quay.io/coreos/kube-state-metrics:v1.0.1
+        image: quay.io/coreos/kube-state-metrics:KUBE_STATE_METRICS_VERSION
         ports:
         - name: metrics
           containerPort: 8080
@@ -30,7 +30,7 @@ spec:
             memory: 200Mi
             cpu: 200m
       - name: addon-resizer
-        image: gcr.io/google_containers/addon-resizer:1.0
+        image: gcr.io/google_containers/addon-resizer:1.2
         resources:
           limits:
             cpu: 100m
