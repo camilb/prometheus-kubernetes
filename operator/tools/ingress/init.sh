@@ -116,3 +116,4 @@ git checkout *
 
 echo
 echo -e "${GREEN}Done"
+tput sgr0
