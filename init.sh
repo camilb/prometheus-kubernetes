@@ -298,3 +298,4 @@ kill $!
 # set up proxy for the user
 echo
 echo -e "${GREEN}Done"
+tput sgr0
