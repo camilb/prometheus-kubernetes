@@ -28,7 +28,16 @@ receivers:
 - name: 'default-receiver'
   slack_configs:
   - channel: '#your_slack_channel'
-    text: '{{ .Alerts.Firing }}/{{ .GroupLabels.alertname }}/{{ .GroupLabels.SortedPairs.Values }}'
+    title: '[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] Prometehus Event Notification'
+    text: >-
+        {{ range .Alerts }}
+           *Alert:* {{ .Annotations.summary }} - `{{ .Labels.severity }}`
+          *Description:* {{ .Annotations.description }}
+          *Graph:* <{{ .GeneratorURL }}|:chart_with_upwards_trend:> *Runbook:* <{{ .Annotations.runbook }}|:spiral_note_pad:>
+          *Details:*
+          {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
+          {{ end }}
+        {{ end }}
     send_resolved: true
   email_configs:
   - to: 'your_alert_email_address'
