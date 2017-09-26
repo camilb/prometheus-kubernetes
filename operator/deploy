@@ -121,11 +121,11 @@ if [[ $use_smtp =~ ^([yY][eE][sS]|[yY])$ ]]; then
   done
 
   #update configmap with SMTP relay info
-  sed -i -e 's/your_smtp_smarthost/'"$smtp_smarthost"'/g' assets/alertmanager.yaml
-  sed -i -e 's/your_smtp_from/'"$smtp_from"'/g' assets/alertmanager.yaml
-  sed -i -e 's/your_smtp_user/'"$smtp_user"'/g' assets/alertmanager.yaml
-  sed -i -e 's,your_smtp_pass,'"$smtp_password"',g' assets/alertmanager.yaml
-  sed -i -e 's/your_alert_email_address/'"$alert_email_address"'/g' assets/alertmanager.yaml
+  sed -i -e 's/your_smtp_smarthost/'"$smtp_smarthost"'/g' assets/alertmanager/alertmanager.yaml
+  sed -i -e 's/your_smtp_from/'"$smtp_from"'/g' assets/alertmanager/alertmanager.yaml
+  sed -i -e 's/your_smtp_user/'"$smtp_user"'/g' assets/alertmanager/alertmanager.yaml
+  sed -i -e 's,your_smtp_pass,'"$smtp_password"',g' assets/alertmanager/alertmanager.yaml
+  sed -i -e 's/your_alert_email_address/'"$alert_email_address"'/g' assets/alertmanager/alertmanager.yaml
 fi
 
 #Do you want to set up slack?
@@ -141,8 +141,8 @@ if [[ $use_slack =~ ^([yY][eE][sS]|[yY])$ ]]; then
   read -p "Slack channel: " slack_channel
 
   #again, our sed is funky due to slashes appearing in slack api tokens
-  sed -i -e 's,your_slack_api_token,'"$slack_api_token"',g' assets/alertmanager.yaml
-  sed -i -e 's/your_slack_channel/'"$slack_channel"'/g' assets/alertmanager.yaml
+  sed -i -e 's,your_slack_api_token,'"$slack_api_token"',g' assets/alertmanager/alertmanager.yaml
+  sed -i -e 's/your_slack_channel/'"$slack_channel"'/g' assets/alertmanager/alertmanager.yaml
 fi
 
 ######################################################################################################
