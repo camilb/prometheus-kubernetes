@@ -40,6 +40,34 @@ data:
           description: Reloading Alertmanager's configuration has failed for {{ $labels.namespace
             }}/{{ $labels.pod}}.
           summary: Alertmanager configuration reload has failed
+  custom.rules: |+
+    groups:
+    - name: custom.rules
+      rules:
+      - alert: DeploymentGenerationMismatch
+        expr: kube_deployment_status_observed_generation{job="kube-state-metrics"} != kube_deployment_metadata_generation{job="kube-state-metrics"}
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+        summary: 'Deployment of {{$labels.exported_namespace}}/{{$labels.name}} failed'
+        description: 'Deployment of {{$labels.exported_namespace}}/{{$labels.name}} failed - observed generation != intended generation'
+      - alert: DeploymentReplicasMismatch
+        expr: kube_deployment_spec_replicas{job="kube-state-metrics"} != kube_deployment_status_availableReplicas{job="kube-state-metrics"}
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+        summary: 'Deployment of {{$labels.exported_namespace}}/{{$labels.name}} failed.'
+        description: 'Deployment of {{$labels.exported_namespace}}/{{$labels.name}} failed - observed replicas != intended replicas.'
+      - alert: PodRestartingTooMuch
+        expr: rate(kube_pod_container_status_restarts[1m]) > 1/(5*60)
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+        summary: 'Pod {{$labels.namespace}}/{{$label.name}} restarting too much.'
+        description: 'Pod {{$labels.namespace}}/{{$label.name}} restarting too much.'
   etcd3.rules: |+
     groups:
     - name: etcd.rules
