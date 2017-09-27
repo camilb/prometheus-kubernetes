@@ -61,8 +61,8 @@ data:
           summary: 'Deployment of {{$labels.exported_namespace}}/{{$labels.name}} failed.'
           description: 'Deployment of {{$labels.exported_namespace}}/{{$labels.name}} failed - observed replicas != intended replicas.'
       - alert: PodRestartingTooMuch
-        expr: rate(kube_pod_container_status_restarts[1m]) > 1/(5*60)
-        for: 1h
+        expr: rate(kube_pod_container_status_restarts[10m])*1200 > 2
+        for: 5m
         labels:
           severity: warning
         annotations:
