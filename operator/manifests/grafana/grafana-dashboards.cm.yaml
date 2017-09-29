@@ -1880,9 +1880,10 @@ data:
         ]
       },
       "timezone": "browser",
-      "title": "Kubernetes Capacity Planing",
+      "title": "Kubernetes Capacity Planning",
       "version": 4
-    },
+    }
+    ,
       "inputs": [
         {
           "name": "DS_PROMETHEUS",
@@ -1912,7 +1913,7 @@ data:
           "type": "grafana",
           "id": "grafana",
           "name": "Grafana",
-          "version": "4.5.2"
+          "version": "4.4.1"
         },
         {
           "type": "datasource",
@@ -2080,7 +2081,7 @@ data:
               "tableColumn": "",
               "targets": [
                 {
-                  "expr": "sum(ALERTS{alertstate=\"firing\"})",
+                  "expr": "sum(ALERTS{alertstate=\"firing\",alertname!=\"DeadMansSwitch\"})",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "",
@@ -2095,7 +2096,7 @@ data:
               "valueMaps": [
                 {
                   "op": "=",
-                  "text": "N/A",
+                  "text": "0",
                   "value": "null"
                 }
               ],
@@ -2158,7 +2159,7 @@ data:
               "tableColumn": "",
               "targets": [
                 {
-                  "expr": "sum(ALERTS{alertstate=\"pending\"})",
+                  "expr": "sum(ALERTS{alertstate=\"pending\",alertname!=\"DeadMansSwitch\"})",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "",
@@ -2173,7 +2174,7 @@ data:
               "valueMaps": [
                 {
                   "op": "=",
-                  "text": "N/A",
+                  "text": "0",
                   "value": "null"
                 }
               ],
@@ -2326,7 +2327,7 @@ data:
               "tableColumn": "",
               "targets": [
                 {
-                  "expr": "sum(kube_node_status_condition{condition!=\"Ready\", status=\"true\"})",
+                  "expr": "sum(kube_node_status_condition{condition=\"Ready\",status!=\"true\"})",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "",
@@ -2404,7 +2405,7 @@ data:
               "tableColumn": "",
               "targets": [
                 {
-                  "expr": "sum(kube_node_status_disk_pressure{condition=\"true\"})",
+                  "expr": "sum(kube_node_status_condition{condition=\"DiskPressure\",status=\"true\"})",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "",
@@ -2482,7 +2483,7 @@ data:
               "tableColumn": "",
               "targets": [
                 {
-                  "expr": "sum(kube_node_status_memory_pressure{condition=\"true\"})",
+                  "expr": "sum(kube_node_status_condition{condition=\"MemoryPressure\",status=\"true\"})",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "",
@@ -2627,7 +2628,7 @@ data:
       },
       "timezone": "",
       "title": "Kubernetes Cluster Health",
-      "version": 12
+      "version": 9
     }
     ,
       "inputs": [
@@ -3781,7 +3782,7 @@ data:
               "tableColumn": "",
               "targets": [
                 {
-                  "expr": "sum(ALERTS{alertstate=\"firing\"})",
+                  "expr": "sum(ALERTS{alertstate=\"firing\",alertname!=\"DeadMansSwitch\"})",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "",
@@ -3796,7 +3797,7 @@ data:
               "valueMaps": [
                 {
                   "op": "=",
-                  "text": "N/A",
+                  "text": "0",
                   "value": "null"
                 }
               ],
@@ -3871,7 +3872,7 @@ data:
               "tableColumn": "",
               "targets": [
                 {
-                  "expr": "(sum(up{job=\"apiserver\"} == 1) / sum(up{job=\"apiserver\"})) * 100",
+                  "expr": "(sum(up{job=\"apiserver\"} == 1) / count(up{job=\"apiserver\"})) * 100",
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 2,
@@ -3950,7 +3951,7 @@ data:
               "tableColumn": "",
               "targets": [
                 {
-                  "expr": "(sum(up{job=\"kube-controller-manager\"} == 1) / sum(up{job=\"kube-controller-manager\"})) * 100",
+                  "expr": "(sum(up{job=\"kube-controller-manager\"} == 1) / count(up{job=\"kube-controller-manager\"})) * 100",
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 2,
@@ -4029,7 +4030,7 @@ data:
               "tableColumn": "",
               "targets": [
                 {
-                  "expr": "(sum(up{job=\"kube-scheduler\"} == 1) / sum(up{job=\"kube-scheduler\"})) * 100",
+                  "expr": "(sum(up{job=\"kube-scheduler\"} == 1) / count(up{job=\"kube-scheduler\"})) * 100",
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 2,
@@ -4497,8 +4498,9 @@ data:
       },
       "timezone": "",
       "title": "Kubernetes Cluster Status",
-      "version": 22
-    },
+      "version": 3
+    }
+    ,
       "inputs": [
         {
           "name": "DS_PROMETHEUS",
@@ -4847,7 +4849,7 @@ data:
               "tableColumn": "",
               "targets": [
                 {
-                  "expr": "topk(1, (sum by(instance) (rate(apiserver_request_count{code!~\"2..\"}[5m])) / sum by(instance) (rate(apiserver_request_count[5m]))) * 100)",
+                  "expr": "topk(1, (sum by(instance) (rate(apiserver_request_count{code=~\"5..\"}[5m])) / sum by(instance) (rate(apiserver_request_count[5m]))) * 100)",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "",
@@ -4862,7 +4864,7 @@ data:
               "valueMaps": [
                 {
                   "op": "=",
-                  "text": "N/A",
+                  "text": "0",
                   "value": "null"
                 }
               ],
@@ -5173,8 +5175,9 @@ data:
       },
       "timezone": "",
       "title": "Kubernetes Control Plane Status",
-      "version": 11
-    },
+      "version": 3
+    }
+    ,
       "inputs": [
         {
           "name": "DS_PROMETHEUS",
