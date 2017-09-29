@@ -1912,7 +1912,7 @@ data:
           "type": "grafana",
           "id": "grafana",
           "name": "Grafana",
-          "version": "4.4.1"
+          "version": "4.5.2"
         },
         {
           "type": "datasource",
@@ -2326,7 +2326,7 @@ data:
               "tableColumn": "",
               "targets": [
                 {
-                  "expr": "sum(kube_node_status_ready{condition!=\"true\"})",
+                  "expr": "sum(kube_node_status_condition{condition!=\"Ready\", status=\"true\"})",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "",
@@ -2628,7 +2628,8 @@ data:
       "timezone": "",
       "title": "Kubernetes Cluster Health",
       "version": 12
-    },
+    }
+    ,
       "inputs": [
         {
           "name": "DS_PROMETHEUS",
