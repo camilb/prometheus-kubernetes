@@ -1,0 +1,18 @@
+#! /bin/sh
+
+PROMKUBE_VERSION=${PROMKUBE_VERSION:-v2.0.0-beta.3}
+
+NAME="prometheus-kubernetes"
+
+URL="https://github.com/camilb/$NAME"
+echo "Clonning $NAME from $URL ..."
+tput sgr0
+
+git clone "$URL"
+cd $NAME
+echo
+
+git -c advice.detachedHead=false checkout tags/$PROMKUBE_VERSION -b $NAME
+tput sgr0
+echo
+echo "Go to ./prometheus-kubernetes and execute ./deploy to install HA Prometheus Operator."
