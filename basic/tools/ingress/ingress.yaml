@@ -14,14 +14,14 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: prometheus-k8s
+          serviceName: prometheus
           servicePort: 9090
   - host: alertmanager.domain_name
     http:
       paths:
       - path: /
         backend:
-          serviceName: alertmanager-main
+          serviceName: alertmanager
           servicePort: 9093
   - host: grafana.domain_name
     http:

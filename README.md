@@ -1,55 +1,72 @@
-# Monitoring Kubernetes  clusters on AWS using Prometheus
+# Monitoring Kubernetes  clusters on AWS using Prometheus Operator by CoreOS
 
 
 ![alt](https://www.camil.org/content/images/2017/cluster.png)
 
+**Note:** the work on this repository is now based on CoreOS's [kube-prometheus](https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus) and it will be the default option for Kubernetes 1.7.X and up. For 1.5.X and 1.6.X you can deploy a simpler solution, located in `./basic` directory.
+The purpose of this project is to provide a simple and interactive method to deploy and configure Prometheus on Kubernetes, especially for the users that are not using Helm.
+
 ## Features
-* Prometheus v2.X.X
-* InCluster deployment using a `StatefulSet` for persistent storage
-* auto-discovery for services and pods annotated with `prometheus.io/scrape: 'true'`
-* automatic configuration for RBAC
+* Prometheus Operator with support for Prometheus v2.X.X
+* highly available Prometheus and Alertmaneger
+* InCluster deployment using `StatefulSets` for persistent storage
+* auto-discovery for services and pods
+* automatic RBAC configuration
 * preconfigured alerts
 * preconfigured Grafana dashboards
-* easy to setup; usually less than a minute to deploy a basic monitoring solution for Kubernetes
-* support for Kubernetes v1.6.0 and up
-
-
-If you prefer a much advanced monitoring solution based on [Prometheus Operator](https://github.com/coreos/prometheus-operator) please check the `./operator` directory.
+* easy to setup; usually less than a minute to deploy a complete monitoring solution for Kubernetes
+* support for Kubernetes v1.7.x and up
 
 ## One minute deployment
-[![asciicast](https://asciinema.org/a/QdIFKxowJ9XOSpS9QYuGI23J5.png)](https://asciinema.org/a/QdIFKxowJ9XOSpS9QYuGI23J5)
 
+[![asciicast](https://asciinema.org/a/139033.png)](https://asciinema.org/a/139033)
 
 ## Prerequisites
 
 * Kubernetes cluster and `kubectl` configured
-* Security Groups configured to allow port 9100/TCP for `prometheus node-exporter` and 10250/TCP for k8s nodes metrics.
+* Security Groups configured to allow the fallowing ports:
+     * 9100/TCP  -                node-exporter
+     * 10250/TCP -                kubernetes nodes metrics,
+     * 10251/TCP -                kube-scheduler
+     * 10252/TCP -                kube-controller-manager
+     * 10054/TCP and 10055/TCP -  kube-dns
 
 #### Optional
 * SMTP Account for email alerts
-* Token for alerts on Slack
-* A IAM Role with EC2 ReadOnly access for EC2 instances monitoring. Only required for monitoring AWS nodes that are not part of the kubernetes cluster
-
-
+* Token for Slack alerts
 
 ## Pre-Deployment
 
-Clone repository
-
-    git clone github.com/camilb/prometheus-kubernetes && cd prometehus-kubernetes
-
-Make any desired configuration changes in `configmaps` according to your setup.
-* ./k8s/prometheus/prometheus.cm.yaml
-* ./k8s/prometheus/alertmanager.cm.yaml
+Clone the repository and checkout the latest release: `curl -L https://git.io/getPrometheusKubernetes | sh -`
 
 
-## Deploy Prometheus, Alertmaneger, Node Exporter, Grafana and Kube State Metrics
+## Custom settings
 
-    ./init.sh
+All the components versions can be configured using the interactive deployment script. Same for the SMTP account or the Slack token.
 
-* The init script will ask some basic questions and attempt to auto-discover information about your system.
+Some other settings that can be changed before deployment:
+  * **Prometheus replicas:** default **2** ==> `manifests/prometheus/prometheus-k8s.yaml`
+  * **persistent volume size:** default **40Gi** ==> `manifests/prometheus/prometheus-k8s.yaml`
+  * **allocated memory for Prometheus pods:** default **2Gi** ==> `manifests/prometheus/prometheus-k8s.yaml`
+  * **Alertmanager replicas:** default **3** ==> `manifests/alertmanager/alertmanager.yaml`
+  * **Alertmanager configuration:** ==> `assets/alertmanager/alertmanager.yaml`
+  * **custom Grafana dashboards:** add yours in `assets/grafana/` with names ending in `-dashboard.json`
+  * **custom alert rules:**  ==> `assets/prometheus/rules/`
+
+**Note:** please commit your changes before deployment if you wish to keep them. The `deploy` script will remove the changes on most of the files.
+
+## Deploy
+
+    ./deploy
+
+Now you can access the dashboards locally using `kubectl port-forward`command, or expose the services using a ingress or a LoadBalancer. Please check the `./tools` directory to quickly configure a ingress or proxy the services to localhost.
+
+To remove everything, just execute the `./teardown` script.
 
 
-Now you can access the dashboards locally using `kubectl port-forward`command, creating a ingress or a LoadBalancer. Please check the `./tools` directory to quickly configure a ingress or proxy the services to localhost.
+## Updating configurations
 
-To remove everything, just execute the `./remove.sh` script.
+  * **update alert rules:** add or change the rules in `assets/prometheus/rules/` and execute `scripts/generate-rules-configmap.sh`. Then apply the changes using `kubectl apply -f manifests/prometheus/prometheus-k8s-rules.yaml -n monitoring`
+  * **update grafana dashboards:** add or change the existing dashboards in `assets/grafana/` and execute `scripts/generate-dashboards-configmap.sh`. Then apply the changes using `kubectl apply -f manifests/grafana/grafana-dashboards.cm.yaml`.
+
+**Note:** all the Grafana dashboards should have names ending in `-dashboard.json`.
