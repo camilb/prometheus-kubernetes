@@ -7,3 +7,4 @@ metadata:
 spec:
   replicas: 3
   version: ALERT_MANAGER_VERSION
+  externalUrl: ALERT_MANAGER_EXTERNAL_URL

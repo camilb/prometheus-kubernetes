@@ -508,7 +508,7 @@ data:
           summary: Node is under disk pressure.
       - alert: NodeCPUUsage
         expr: (100 - (avg by (instance) (irate(node_cpu{job="node-exporter",mode="idle"}[5m])) * 100)) > 80
-        for: 5m
+        for: 30m
         labels:
           severity: warning
         annotations:
@@ -516,7 +516,7 @@ data:
           description: "{{$labels.instance}}: CPU usage is above 85% (current value is: {{ $value }})"
       - alert: NodeMemoryUsage
         expr: (((node_memory_MemTotal-node_memory_MemFree-node_memory_Cached)/(node_memory_MemTotal)*100)) > 85
-        for: 5m
+        for: 30m
         labels:
           severity: warning
         annotations:

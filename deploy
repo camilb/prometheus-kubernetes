@@ -6,9 +6,15 @@
 GRAFANA_DEFAULT_VERSION=4.5.2
 PROMETHEUS_DEFAULT_VERSION=v2.0.0-beta.5
 PROMETHEUS_OPERATOR_DEFAULT_VERSION=v0.13.0
-ALERT_MANAGER_DEFAULT_VERSION=v0.9.1
+ALERTMANAGER_DEFAULT_VERSION=v0.9.1
 NODE_EXPORTER_DEFAULT_VERSION=v0.14.0
 KUBE_STATE_METRICS_DEFAULT_VERSION=v1.0.1
+
+#########################################################################################
+#external Urls for Prometheus and Alertmanager
+#########################################################################################
+PROMETHEUS_DEFAULT_EXTERNAL_URL=http://127.0.0.1:9090
+ALERTMANAGER_DEFAULT_EXTERNAL_URL=http://127.0.0.1:9093
 
 #########################################################################################
 #environment configuration
@@ -58,8 +64,8 @@ GRAFANA_VERSION=${GRAFANA_VERSION:-$GRAFANA_DEFAULT_VERSION}
 
 #Alertmanager
 echo
-read -p "Enter Alert Manager version [$ALERT_MANAGER_DEFAULT_VERSION]: " ALERT_MANAGER_VERSION
-ALERT_MANAGER_VERSION=${ALERT_MANAGER_VERSION:-$ALERT_MANAGER_DEFAULT_VERSION}
+read -p "Enter Alert Manager version [$ALERTMANAGER_DEFAULT_VERSION]: " ALERTMANAGER_VERSION
+ALERTMANAGER_VERSION=${ALERTMANAGER_VERSION:-$ALERTMANAGER_DEFAULT_VERSION}
 
 #Node Exporter
 echo
@@ -71,6 +77,16 @@ echo
 read -p "Enter Kube State Metrics version [$KUBE_STATE_METRICS_DEFAULT_VERSION]: " KUBE_STATE_METRICS_VERSION
 KUBE_STATE_METRICS_VERSION=${KUBE_STATE_METRICS_VERSION:-$KUBE_STATE_METRICS_DEFAULT_VERSION}
 
+#Prometheus External URL
+echo
+read -p "Enter Prometheus external Url [$PROMETHEUS_DEFAULT_EXTERNAL_URL]: " PROMETHEUS_EXTERNAL_URL
+PROMETHEUS_EXTERNAL_URL=${PROMETHEUS_EXTERNAL_URL:-$PROMETHEUS_DEFAULT_EXTERNAL_URL}
+
+#Alertmanager External URL
+echo
+read -p "Enter Alertmanager external Url [$ALERTMANAGER_DEFAULT_EXTERNAL_URL]: " ALERTMANAGER_EXTERNAL_URL
+ALERTMANAGER_EXTERNAL_URL=${ALERTMANAGER_EXTERNAL_URL:-$ALERTMANAGER_DEFAULT_EXTERNAL_URL}
+
 #set prometheus operator version
 sed -i -e 's/PROMETHEUS_OPERATOR_VERSION/'"$PROMETHEUS_OPERATOR_VERSION"'/g' manifests/prometheus-operator/prometheus-operator.yaml
 
@@ -81,13 +97,19 @@ sed -i -e 's/PROMETHEUS_VERSION/'"$PROMETHEUS_VERSION"'/g' manifests/prometheus/
 sed -i -e 's/GRAFANA_VERSION/'"$GRAFANA_VERSION"'/g' manifests/grafana/grafana.de.yaml
 
 #set alertmanager version
-sed -i -e 's/ALERT_MANAGER_VERSION/'"$ALERT_MANAGER_VERSION"'/g' manifests/alertmanager/alertmanager.yaml
+sed -i -e 's/ALERTMANAGER_VERSION/'"$ALERTMANAGER_VERSION"'/g' manifests/alertmanager/alertmanager.yaml
 
 #set node-exporter version
 sed -i -e 's/NODE_EXPORTER_VERSION/'"$NODE_EXPORTER_VERSION"'/g' manifests/node-exporter/node-exporter.ds.yaml
 
 #set node-exporter version
 sed -i -e 's/KUBE_STATE_METRICS_VERSION/'"$KUBE_STATE_METRICS_VERSION"'/g' manifests/kube-state-metrics/kube-state-metrics.de.yaml
+
+#set prometheus external url
+sed -i -e 's,PROMETHEUS_EXTERNAL_URL,'"$PROMETHEUS_EXTERNAL_URL"',g' manifests/prometheus/prometheus-k8s.yaml
+
+#set alertmanager external url
+sed -i -e 's,ALERTMANAGER_EXTERNAL_URL,'"$ALERTMANAGER_EXTERNAL_URL"',g' manifests/alertmanager/alertmanager.yaml
 
 ##########################################################################################################################################
 #configure alert channels
