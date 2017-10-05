@@ -6,5 +6,5 @@ metadata:
     alertmanager: main
 spec:
   replicas: 3
-  version: ALERT_MANAGER_VERSION
-  externalUrl: ALERT_MANAGER_EXTERNAL_URL
+  version: ALERTMANAGER_VERSION
+  externalUrl: ALERTMANAGER_EXTERNAL_URL
