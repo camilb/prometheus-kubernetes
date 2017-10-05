@@ -4,7 +4,7 @@
 #components default version
 #########################################################################################
 GRAFANA_DEFAULT_VERSION=4.5.2
-PROMETHEUS_DEFAULT_VERSION=v2.0.0-beta.5
+PROMETHEUS_DEFAULT_VERSION=v2.0.0-rc.0
 PROMETHEUS_OPERATOR_DEFAULT_VERSION=v0.13.0
 ALERTMANAGER_DEFAULT_VERSION=v0.9.1
 NODE_EXPORTER_DEFAULT_VERSION=v0.14.0
