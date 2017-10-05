@@ -167,6 +167,10 @@ if [[ $use_slack =~ ^([yY][eE][sS]|[yY])$ ]]; then
   sed -i -e 's/your_slack_channel/'"$slack_channel"'/g' assets/alertmanager/alertmanager.yaml
 fi
 
+echo
+echo -e "${BLUE}Removing all the sed generated files"
+find . -name "*.yaml-e" -exec rm -rf {} \;
+tput sgr0
 ######################################################################################################
 #deploy all the components
 ######################################################################################################
@@ -256,9 +260,6 @@ kubectl apply -f manifests/k8s/self-hosted
 ######################################################################################################
 echo
 echo -e "${BLUE}Removing local changes"
-#remove  "sed" generated files
-find . -name "*.yaml-e" -exec rm -rf {} \;
-
 git checkout -- .
 
 echo
