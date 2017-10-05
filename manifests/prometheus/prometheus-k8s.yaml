@@ -15,6 +15,7 @@ metadata:
 spec:
   replicas: 2
   version: PROMETHEUS_VERSION
+  externalUrl: PROMETHEUS_EXTERNAL_URL
   serviceAccountName: prometheus-k8s
   serviceMonitorSelector:
     matchExpressions:
