@@ -14,8 +14,8 @@ spec:
       containers:
       - image:  quay.io/prometheus/node-exporter:NODE_EXPORTER_VERSION
         args:
-        - "-collector.procfs=/host/proc"
-        - "-collector.sysfs=/host/sys"
+        - "--path.procfs=/host/proc"
+        - "--path.sysfs=/host/sys"
         name: node-exporter
         ports:
         - containerPort: 9100
