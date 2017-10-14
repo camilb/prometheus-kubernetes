@@ -14,7 +14,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "4.4.1"
+      "version": "4.5.2"
     },
     {
       "type": "panel",
@@ -87,7 +87,8 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum(rate(node_cpu{mode=\"idle\"}[2m])) * 100",
+              "expr": "sum(rate(node_cpu{mode=\"idle\"}[2m]))",
+              "format": "time_series",
               "hide": false,
               "intervalFactor": 10,
               "legendFormat": "",
@@ -169,6 +170,7 @@
           "targets": [
             {
               "expr": "sum(node_load1)",
+              "format": "time_series",
               "intervalFactor": 4,
               "legendFormat": "load 1m",
               "refId": "A",
@@ -177,6 +179,7 @@
             },
             {
               "expr": "sum(node_load5)",
+              "format": "time_series",
               "intervalFactor": 4,
               "legendFormat": "load 5m",
               "refId": "B",
@@ -185,6 +188,7 @@
             },
             {
               "expr": "sum(node_load15)",
+              "format": "time_series",
               "intervalFactor": 4,
               "legendFormat": "load 15m",
               "refId": "C",
@@ -212,7 +216,7 @@
           },
           "yaxes": [
             {
-              "format": "percentunit",
+              "format": "percent",
               "label": null,
               "logBase": 1,
               "max": null,
