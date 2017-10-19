@@ -3,12 +3,12 @@
 #########################################################################################
 #components default version
 #########################################################################################
-GRAFANA_DEFAULT_VERSION=4.5.2
-PROMETHEUS_DEFAULT_VERSION=v2.0.0-rc.0
-PROMETHEUS_OPERATOR_DEFAULT_VERSION=v0.13.0
+GRAFANA_DEFAULT_VERSION=4.6.2-beta2
+PROMETHEUS_DEFAULT_VERSION=v2.0.0-rc.1
+PROMETHEUS_OPERATOR_DEFAULT_VERSION=v0.14.0
 ALERTMANAGER_DEFAULT_VERSION=v0.9.1
 NODE_EXPORTER_DEFAULT_VERSION=v0.15.0
-KUBE_STATE_METRICS_DEFAULT_VERSION=v1.0.1
+KUBE_STATE_METRICS_DEFAULT_VERSION=v1.1.0
 
 #########################################################################################
 #external Urls for Prometheus and Alertmanager
