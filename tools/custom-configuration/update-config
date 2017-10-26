@@ -1,0 +1,84 @@
+#!/bin/bash
+
+#########################################################################################
+#environment configuration
+#########################################################################################
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+ORANGE='\033[0;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+if [ -z "${KUBECONFIG}" ]; then
+    export KUBECONFIG=~/.kube/config
+fi
+
+if [ -z "${NAMESPACE}" ]; then
+    NAMESPACE=monitoring
+fi
+
+kctl() {
+    kubectl --namespace "$NAMESPACE" "$@"
+}
+
+###########################################################################################
+#set prometheus version and externalUrl
+###########################################################################################
+echo -e "${BLUE}Exporting existing configurations"
+tput sgr0
+echo
+if [ $(kctl get secret prometheus-k8s --no-headers | cut -d " " -f1) ] && [ $(kctl get prometheus k8s --no-headers | cut -d " " -f1) ]; then
+  PROMETHEUS_VERSION=$(kubectl get prometheus k8s -o 'jsonpath={.spec.version}' -n monitoring)
+  PROMETHEUS_EXTERNAL_URL=$(kubectl get prometheus k8s -o 'jsonpath={.spec.externalUrl}' -n monitoring)
+  sed -i -e 's/PROMETHEUS_VERSION/'"$PROMETHEUS_VERSION"'/g' ./prometheus-k8s.yaml
+  sed -i -e 's,PROMETHEUS_EXTERNAL_URL,'"$PROMETHEUS_EXTERNAL_URL"',g' ./prometheus-k8s.yaml
+else
+  echo -e "${BLUE}Could not find the Prometheus object and secret. Please deploy Prometheus Operator before updating."
+  tput sgr0
+  exit
+fi
+
+###########################################################################################
+#Remove "sed" generated files
+###########################################################################################
+echo
+echo -e "${BLUE}Removing all the sed generated files"
+find . -name "*.yaml-e" -exec rm -rf {} \;
+tput sgr0
+
+#################################################################################################################################
+#export existing Prometheus configuration
+##########################################################################################################################################
+echo
+echo -e "${BLUE}Exporting prometheus.yaml key to ./prometheus-k8s-secret/prometheus.yaml"
+kctl get secret prometheus-k8s -o 'jsonpath={.data.prometheus\.yaml}' | base64 --decode > prometheus-k8s-secret/prometheus.yaml
+tput sgr0
+echo
+echo -e "${BLUE}Exporting configmaps.json key to ./prometheus-k8s-secret/configmaps.json"
+kctl get secret prometheus-k8s -o 'jsonpath={.data.configmaps\.json}' | base64 --decode > prometheus-k8s-secret/configmaps.json
+tput sgr0
+echo
+
+###########################################################################################
+#delete existing Prometheus object and secret
+###########################################################################################
+echo -e "${BLUE}Delete prometheus object and secret"
+tput sgr0
+kctl delete prometheus k8s
+echo
+
+###########################################################################################
+#Create new Prometheus secret and deploy new Prometheus
+###########################################################################################
+echo
+echo -e "${BLUE}Please make the desired changes in ./prometheus-k8s-secret/prometheus.yaml and press Y to continue."
+tput sgr0
+read -p "Y/N [Y]: " update_config
+
+if [[ $update_config =~ ^([yY]|[yY])$ ]]; then
+  kctl create secret generic prometheus-k8s --from-file=./prometheus-k8s-secret
+  kctl create -f ./prometheus-k8s.yaml
+fi
+
+echo
+echo -e "${GREEN}Done"
+tput sgr0

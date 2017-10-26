@@ -70,3 +70,8 @@ To remove everything, just execute the `./teardown` script.
   * **update grafana dashboards:** add or change the existing dashboards in `assets/grafana/` and execute `scripts/generate-dashboards-configmap.sh`. Then apply the changes using `kubectl apply -f manifests/grafana/grafana-dashboards.cm.yaml`.
 
 **Note:** all the Grafana dashboards should have names ending in `-dashboard.json`.
+
+## Custom Prometheus configuration
+
+  The official documentation for Prometheus Operator custom configuration can be found here: [custom-configuration.md](https://github.com/coreos/prometheus-operator/blob/master/Documentation/custom-configuration.md)
+  If you wish, you can update the Prometheus configuration using the `./tools/custom-configuration/update_config` script.
