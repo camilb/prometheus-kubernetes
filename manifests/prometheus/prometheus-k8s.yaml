@@ -2,9 +2,9 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: ssd
-provisioner: kubernetes.io/aws-ebs
+provisioner: STORAGE_CLASS_PROVISIONER
 parameters:
-  type: gp2
+  type: pd-standard
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: Prometheus
