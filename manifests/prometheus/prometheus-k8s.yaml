@@ -4,7 +4,7 @@ metadata:
   name: ssd
 provisioner: STORAGE_CLASS_PROVISIONER
 parameters:
-  type: pd-standard
+  type: STORAGE_CLASS_TYPE
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: Prometheus
