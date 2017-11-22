@@ -1,4 +1,4 @@
-# Monitoring Kubernetes  clusters on AWS and GCP using Prometheus Operator by CoreOS
+# Monitoring Kubernetes  clusters on AWS, GCP and Azure using Prometheus Operator by CoreOS
 
 
 ![alt](https://www.camil.org/content/images/2017/cluster.png)
@@ -15,8 +15,8 @@ The purpose of this project is to provide a simple and interactive method to dep
 * preconfigured alerts
 * preconfigured Grafana dashboards
 * easy to setup; usually less than a minute to deploy a complete monitoring solution for Kubernetes
-* support for Kubernetes  v1.7.x and up running in  **AWS** and **GCP**
-* tested on clusters deployed using [kube-aws](https://github.com/kubernetes-incubator/kube-aws), [kops](https://github.com/kubernetes/kops) and [GKE](https://cloud.google.com/container-engine/)
+* support for Kubernetes  v1.7.x and up running in  **AWS**, **GCP** and **Azure**
+* tested on clusters deployed using [kube-aws](https://github.com/kubernetes-incubator/kube-aws), [kops](https://github.com/kubernetes/kops), [GKE](https://cloud.google.com/container-engine/) and [Azure](https://azure.microsoft.com)
 ## One minute deployment
 
 [![asciicast](https://asciinema.org/a/139033.png)](https://asciinema.org/a/139033)
