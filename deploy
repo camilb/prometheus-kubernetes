@@ -70,7 +70,8 @@ do
             read -p "Y/N [N]: " use_gke
             if [[ $use_gke =~ ^([yY][eE][sS]|[yY])$ ]]; then
               echo "Grant cluster-admin permissions to your current identity"
-              GCP_USER=$(gcloud info | grep Account | tr -d '[]' | cut -d ":" -f2)
+              GCP_USER=$(gcloud info | grep Account | tr -d '[]' | cut -d ":" -f2 | xargs)
+
               kubectl create clusterrolebinding admin-binding --clusterrole=cluster-admin --user=$GCP_USER
             fi
             sed -i -e 's,STORAGE_CLASS_PROVISIONER,'"$STORAGE_CLASS_PROVISIONER"',g' manifests/prometheus/prometheus-k8s.yaml;
