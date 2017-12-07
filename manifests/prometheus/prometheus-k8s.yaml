@@ -27,6 +27,7 @@ spec:
       role: prometheus-rulefiles
       prometheus: k8s
   resources:
+  retention: PROMETHEUS_STORAGE_RETENTION
   storage:
     volumeClaimTemplate:
       metadata:
@@ -36,7 +37,7 @@ spec:
         storageClassName: ssd
         resources:
           requests:
-            storage: 40Gi
+            storage: PROMETHEUS_STORAGE_VOLUME_SIZE
     requests:
       memory: 2Gi
   alerting:
