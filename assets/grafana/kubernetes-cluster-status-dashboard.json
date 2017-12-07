@@ -1641,7 +1641,7 @@
           "steppedLine": true,
           "targets": [
             {
-              "expr": "sum (irate (apiserver_request_count{code!=\"200\"}[5m]) * 100) by ( code )",
+              "expr": "sum by(code) (rate(apiserver_request_count{code!~\"2..\"}[5m]))",
               "format": "time_series",
               "interval": "10s",
               "intervalFactor": 1,
@@ -1895,5 +1895,5 @@
   },
   "timezone": "",
   "title": "Kubernetes Cluster Status",
-  "version": 6
+  "version": 3
 }
