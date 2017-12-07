@@ -14,7 +14,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "4.4.1"
+      "version": "4.6.2"
     },
     {
       "type": "panel",
@@ -36,7 +36,17 @@
     }
   ],
   "annotations": {
-    "list": []
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
   },
   "editable": true,
   "gnetId": null,
@@ -333,7 +343,7 @@
           "tableColumn": "",
           "targets": [
             {
-              "expr": "topk(1, (sum by(instance) (rate(apiserver_request_count{code=~\"5..\"}[5m])) / sum by(instance) (rate(apiserver_request_count[5m]))) * 100)",
+              "expr": "max(sum by(instance) (rate(apiserver_request_count{code=~\"5..\"}[5m])) / sum by(instance) (rate(apiserver_request_count[5m]))) * 100",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "",
@@ -398,7 +408,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum by(verb) (rate(apiserver_latency_seconds:quantile[5m]) >= 0)",
+              "expr": "sum by(verb) (rate(cluster_resource_verb:apiserver_latency:quantile_seconds[5m]) >= 0)",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "",
@@ -486,7 +496,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "cluster:scheduler_e2e_scheduling_latency_seconds:quantile",
+              "expr": "cluster:scheduler_e2e_scheduling_latency:quantile_seconds",
               "format": "time_series",
               "intervalFactor": 2,
               "refId": "A",
@@ -629,7 +639,7 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {
@@ -659,5 +669,5 @@
   },
   "timezone": "",
   "title": "Kubernetes Control Plane Status",
-  "version": 3
+  "version": 5
 }
