@@ -1,6 +1,6 @@
 #! /bin/sh
 
-PROMKUBE_VERSION=${PROMKUBE_VERSION:-2.0.2}
+PROMKUBE_VERSION=${PROMKUBE_VERSION:-2.0.3}
 
 NAME="prometheus-kubernetes"
 
