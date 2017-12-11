@@ -7,8 +7,6 @@ metadata:
 spec:
   jobLabel: k8s-app
   endpoints:
-  - port: http-metrics
-    interval: 30s
   - port: cadvisor
     interval: 30s
     honorLabels: true
