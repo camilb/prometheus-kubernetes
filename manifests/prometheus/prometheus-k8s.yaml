@@ -27,6 +27,8 @@ spec:
       role: prometheus-rulefiles
       prometheus: k8s
   resources:
+    requests:
+      memory: PROMETHEUS_MEMORY_REQUEST
   retention: PROMETHEUS_STORAGE_RETENTION
   storage:
     volumeClaimTemplate:
@@ -38,8 +40,6 @@ spec:
         resources:
           requests:
             storage: PROMETHEUS_STORAGE_VOLUME_SIZE
-    requests:
-      memory: PROMETHEUS_MEMORY_REQUEST
   alerting:
     alertmanagers:
     - namespace: monitoring
