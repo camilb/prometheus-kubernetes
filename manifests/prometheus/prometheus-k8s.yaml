@@ -39,7 +39,7 @@ spec:
           requests:
             storage: PROMETHEUS_STORAGE_VOLUME_SIZE
     requests:
-      memory: 2Gi
+      memory: PROMETHEUS_MEMORY_REQUEST
   alerting:
     alertmanagers:
     - namespace: monitoring
