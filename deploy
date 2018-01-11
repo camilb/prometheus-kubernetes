@@ -74,7 +74,12 @@ do
             if [[ $use_gke =~ ^([yY][eE][sS]|[yY])$ ]]; then
               echo "Grant cluster-admin permissions to your current identity"
               GCP_USER=$(gcloud info | grep Account | tr -d '[]' | cut -d ":" -f2 | xargs)
-
+              echo "Remove rules for self hosted clusters"
+              rm assets/prometheus/rules//kube-apiserver.rules
+              rm assets/prometheus/rules//kube-controller-manager.rules
+              rm assets/prometheus/rules//kube-scheduler.rules
+              GKE=true
+              echo
               kubectl create clusterrolebinding admin-binding --clusterrole=cluster-admin --user=$GCP_USER
             fi
             sed -i -e 's,STORAGE_CLASS_PROVISIONER,'"$STORAGE_CLASS_PROVISIONER"',g' manifests/prometheus/prometheus-k8s.yaml;
@@ -85,6 +90,17 @@ do
             echo "Deploying on Azure"
             STORAGE_CLASS_PROVISIONER=kubernetes.io/azure-disk
             STORAGE_CLASS_TYPE=Managed
+            echo -e "${BLUE}Are you deploying in Azure Container Engine (AKS)?"
+            tput sgr0
+            read -p "Y/N [N]: " use_aks
+            if [[ $use_aks =~ ^([yY][eE][sS]|[yY])$ ]]; then
+              echo "Remove rules for self hosted clusters"
+              rm assets/prometheus/rules//kube-apiserver.rules
+              rm assets/prometheus/rules//kube-controller-manager.rules
+              rm assets/prometheus/rules//kube-scheduler.rules
+              AKS=true
+              echo
+            fi
             sed -i -e 's,type,'kind',g' manifests/prometheus/prometheus-k8s.yaml;
             sed -i -e 's,STORAGE_CLASS_PROVISIONER,'"$STORAGE_CLASS_PROVISIONER"',g' manifests/prometheus/prometheus-k8s.yaml;
             sed -i -e 's,STORAGE_CLASS_TYPE,'"$STORAGE_CLASS_TYPE"',g' manifests/prometheus/prometheus-k8s.yaml;
@@ -322,14 +338,25 @@ kctl apply -f manifests/grafana
 echo
 echo -e "${ORANGE}Deploying Prometheus"
 tput sgr0
+#generate prometheus rules
+(cd ./scripts; ./generate-rules-configmap.sh)
+
+#deploy prometheus
 kubectl apply -f manifests/prometheus/prometheus-k8s-rbac.yaml
-find manifests/prometheus -type f ! -name prometheus-k8s-rbac.yaml -exec kubectl --namespace "$NAMESPACE" apply -f {} \;
+find manifests/prometheus -type f -not -path "self-hosted/*" -type f ! -name prometheus-k8s-rbac.yaml -exec kubectl --namespace "$NAMESPACE" apply -f {} \;
 
 #self-hosted
-echo
-echo -e "${ORANGE}Self hosted"
-tput sgr0
-kubectl apply -f manifests/k8s/self-hosted
+if [[ -z "$GKE" ]] || [[ ! "$AKS" ]]; then
+  echo
+  echo -e "${ORANGE}Skipping rules for self hosted clusters "
+  tput sgr0
+else
+  echo
+  echo -e "${ORANGE}Self hosted"
+  tput sgr0
+  kubectl apply -f manifests/k8s/self-hosted
+  kubectl apply -f manifests/prometheus/self-hosted
+fi
 
 ######################################################################################################
 #cleanup
