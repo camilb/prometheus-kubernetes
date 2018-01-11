@@ -29,12 +29,27 @@ BLUE='\033[0;34m'
 PURPLE='\033[0;35m'
 GREEN_PS3=$'\e[0;32m'
 ORANGE_PS3=$'\e[0;33m'
+WHITE='\033[0;37m'
 if [ -z "${KUBECONFIG}" ]; then
     export KUBECONFIG=~/.kube/config
 fi
 
 if [ -z "${NAMESPACE}" ]; then
     NAMESPACE=monitoring
+fi
+
+#check for uncommitted changes
+echo -e "${ORANGE}Check for uncommitted changes"
+echo
+
+if [ "$(git status -s)" != "" ]; then
+  echo -e "${RED}WARNING! ${WHITE}You have uncommitted changes! Please commit your changes now, then press ENTER"
+  tput sgr0
+  git status -s
+  read -p " [ENTER]: " next
+else
+  echo -e "${GREEN}OK! ${WHITE}No uncommitted changes detected"
+  tput sgr0
 fi
 
 echo
