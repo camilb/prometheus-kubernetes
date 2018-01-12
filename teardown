@@ -31,6 +31,8 @@ kctl delete svc alertmanager-operated
 
 kctl delete svc prometheus-operated
 
+kubectl delete clusterrolebinding admin-binding
+
 #delete created custom resource definitions
 
 kubectl get crd -o 'jsonpath={.items[*].metadata.name}' | xargs -n 1 | fgrep coreos.com | xargs kubectl delete crd
