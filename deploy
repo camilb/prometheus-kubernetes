@@ -361,7 +361,7 @@ kubectl apply -f manifests/prometheus/prometheus-k8s-rbac.yaml
 find manifests/prometheus -type f -not -path "self-hosted/*" -type f ! -name prometheus-k8s-rbac.yaml -exec kubectl --namespace "$NAMESPACE" apply -f {} \;
 
 #self-hosted
-if [[ -z "$GKE" ]] || [[ ! "$AKS" ]]; then
+if [[ "$GKE" ]] || [[ "$AKS" ]]; then
   echo
   echo -e "${ORANGE}Skipping rules for self hosted clusters "
   tput sgr0
