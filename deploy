@@ -81,7 +81,7 @@ do
         "GCP")
             echo "Deploying on Google Cloud"
             STORAGE_CLASS_PROVISIONER=kubernetes.io/gce-pd
-            STORAGE_CLASS_TYPE=pd-standard
+            STORAGE_CLASS_TYPE=pd-ssd
             #RBAC in GKE
             echo -e "${BLUE}Are you deploying in Google Container Engine (GKE)?"
             tput sgr0
