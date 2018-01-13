@@ -11,7 +11,7 @@ PROMETHEUS_STORAGE_DEFAULT_VOLUME_SIZE=40Gi
 PROMETHEUS_DEFAULT_MEMORY_REQUEST=1Gi
 ALERTMANAGER_DEFAULT_VERSION=v0.13.0
 NODE_EXPORTER_DEFAULT_VERSION=v0.15.2
-KUBE_STATE_METRICS_DEFAULT_VERSION=v1.1.0
+KUBE_STATE_METRICS_DEFAULT_VERSION=v1.2.0-rc.0
 
 #########################################################################################
 #external Urls for Prometheus and Alertmanager
