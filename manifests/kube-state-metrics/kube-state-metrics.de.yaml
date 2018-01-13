@@ -1,20 +1,24 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1beta2
+# Kubernetes versions after 1.9.0 should use apps/v1
 kind: Deployment
 metadata:
   name: kube-state-metrics
 spec:
+  selector:
+    matchLabels:
+      k8s-app: kube-state-metrics
   replicas: 1
   template:
     metadata:
       labels:
-        app: kube-state-metrics
+        k8s-app: kube-state-metrics
     spec:
       serviceAccountName: kube-state-metrics
       containers:
       - name: kube-state-metrics
         image: quay.io/coreos/kube-state-metrics:KUBE_STATE_METRICS_VERSION
         ports:
-        - name: metrics
+        - name: http-metrics
           containerPort: 8080
         readinessProbe:
           httpGet:
@@ -30,7 +34,7 @@ spec:
             memory: 200Mi
             cpu: 200m
       - name: addon-resizer
-        image: gcr.io/google_containers/addon-resizer:1.2
+        image: k8s.gcr.io/addon-resizer:1.7
         resources:
           limits:
             cpu: 100m
