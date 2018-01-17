@@ -92,7 +92,6 @@ do
               rm assets/prometheus/rules//kube-apiserver.rules
               rm assets/prometheus/rules//kube-controller-manager.rules
               rm assets/prometheus/rules//kube-scheduler.rules
-              GKE=true
               echo
               kubectl create clusterrolebinding admin-binding --clusterrole=cluster-admin --user=$(gcloud config get-value core/account)
             fi
@@ -112,7 +111,6 @@ do
               rm assets/prometheus/rules//kube-apiserver.rules
               rm assets/prometheus/rules//kube-controller-manager.rules
               rm assets/prometheus/rules//kube-scheduler.rules
-              AKS=true
               echo
             fi
             sed -i -e 's,type,'kind',g' manifests/prometheus/prometheus-k8s.yaml;
@@ -366,16 +364,16 @@ kubectl apply -f manifests/prometheus/prometheus-k8s-rbac.yaml
 find manifests/prometheus -type f -not -path "self-hosted/*" -type f ! -name prometheus-k8s-rbac.yaml -exec kubectl --namespace "$NAMESPACE" apply -f {} \;
 
 #self-hosted
-if [[ "$GKE" ]] || [[ "$AKS" ]]; then
-  echo
-  echo -e "${ORANGE}Skipping rules for self hosted clusters "
-  tput sgr0
-else
+if [[ "$(kubectl get pods -n kube-system | grep scheduler)" ]]; then
   echo
   echo -e "${ORANGE}Self hosted"
   tput sgr0
   kubectl apply -f manifests/k8s/self-hosted
   kubectl apply -f manifests/prometheus/self-hosted
+else
+  echo
+  echo -e "${ORANGE}Skipping rules for self hosted clusters "
+  tput sgr0
 fi
 
 ######################################################################################################
