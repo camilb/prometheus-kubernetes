@@ -28,3 +28,5 @@ spec:
             cpu: 100m
             memory: 50Mi
       serviceAccountName: prometheus-operator
+      nodeSelector:
+        node_label_key: node_label_value

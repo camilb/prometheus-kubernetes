@@ -12,6 +12,8 @@ PROMETHEUS_DEFAULT_MEMORY_REQUEST=1Gi
 ALERTMANAGER_DEFAULT_VERSION=v0.13.0
 NODE_EXPORTER_DEFAULT_VERSION=v0.15.2
 KUBE_STATE_METRICS_DEFAULT_VERSION=v1.2.0
+NODE_LABEL_DEFAULT_KEY=beta.kubernetes.io/monit
+NODE_LABEL_DEFAULT_VALUE=prometheus
 
 #########################################################################################
 #external Urls for Prometheus and Alertmanager
@@ -187,6 +189,47 @@ PROMETHEUS_EXTERNAL_URL=${PROMETHEUS_EXTERNAL_URL:-$PROMETHEUS_DEFAULT_EXTERNAL_
 echo
 read -p "Enter Alertmanager external Url [$ALERTMANAGER_DEFAULT_EXTERNAL_URL]: " ALERTMANAGER_EXTERNAL_URL
 ALERTMANAGER_EXTERNAL_URL=${ALERTMANAGER_EXTERNAL_URL:-$ALERTMANAGER_DEFAULT_EXTERNAL_URL}
+
+#Dedicated nodes?
+echo
+echo -e "${ORANGE}Do you want to use ${WHITE}NodeSelector ${ORANGE} to assign monitoring components on dedicated nodes?"
+tput sgr0
+read -p "Y/N [N]: " use_dedicated_nodes
+
+#if so, fill out this form...
+if [[ $use_dedicated_nodes =~ ^([yY][eE][sS]|[yY])$ ]]; then
+
+  echo
+  echo -e "${RED}Make sure you label the nodes correctly. The default label is: ${WHITE}beta.kubernetes.io/monit=prometheus"
+  tput sgr0
+
+  read -p "Node label key [$NODE_LABEL_DEFAULT_KEY]: " NODE_LABEL_KEY
+  NODE_LABEL_KEY=${NODE_LABEL_KEY:-$NODE_LABEL_DEFAULT_KEY}
+
+  read -p "Node label value [$NODE_LABEL_DEFAULT_VALUE]: " NODE_LABEL_VALUE
+  NODE_LABEL_VALUE=${NODE_LABEL_VALUE:-$NODE_LABEL_DEFAULT_VALUE}
+
+  sed -i -e 's,node_label_key,'"$NODE_LABEL_KEY"',g' manifests/alertmanager/alertmanager.yaml
+  sed -i -e 's,node_label_value,'"$NODE_LABEL_VALUE"',g' manifests/alertmanager/alertmanager.yaml
+
+  sed -i -e 's,node_label_key,'"$NODE_LABEL_KEY"',g' manifests/grafana/grafana.de.yaml
+  sed -i -e 's,node_label_value,'"$NODE_LABEL_VALUE"',g' manifests/grafana/grafana.de.yaml
+
+  sed -i -e 's,node_label_key,'"$NODE_LABEL_KEY"',g' manifests/kube-state-metrics/kube-state-metrics.de.yaml
+  sed -i -e 's,node_label_value,'"$NODE_LABEL_VALUE"',g' manifests/kube-state-metrics/kube-state-metrics.de.yaml
+
+  sed -i -e 's,node_label_key,'"$NODE_LABEL_KEY"',g' manifests/prometheus/prometheus-k8s.yaml
+  sed -i -e 's,node_label_value,'"$NODE_LABEL_VALUE"',g' manifests/prometheus/prometheus-k8s.yaml
+
+  sed -i -e 's,node_label_key,'"$NODE_LABEL_KEY"',g' manifests/prometheus-operator/prometheus-operator.yaml
+  sed -i -e 's,node_label_value,'"$NODE_LABEL_VALUE"',g' manifests/prometheus-operator/prometheus-operator.yaml
+else
+  sed -i -e '/node_label_key/d' manifests/alertmanager/alertmanager.yaml
+  sed -i -e '/node_label_key/d' manifests/grafana/grafana.de.yaml
+  sed -i -e '/node_label_key/d' manifests/kube-state-metrics/kube-state-metrics.de.yaml
+  sed -i -e '/node_label_key/d' manifests/prometheus/prometheus-k8s.yaml
+  sed -i -e '/node_label_key/d' manifests/prometheus-operator/prometheus-operator.yaml
+fi
 
 #set prometheus operator version
 sed -i -e 's/PROMETHEUS_OPERATOR_VERSION/'"$PROMETHEUS_OPERATOR_VERSION"'/g' manifests/prometheus-operator/prometheus-operator.yaml
