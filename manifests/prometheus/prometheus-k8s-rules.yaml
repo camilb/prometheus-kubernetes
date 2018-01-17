@@ -40,44 +40,6 @@ data:
           description: Reloading Alertmanager's configuration has failed for {{ $labels.namespace
             }}/{{ $labels.pod}}.
           summary: Alertmanager configuration reload has failed
-  custom.rules: |+
-    groups:
-    - name: custom.rules
-      rules:
-      - alert: DeploymentGenerationMismatch
-        expr: kube_deployment_status_observed_generation{job="kube-state-metrics"} != kube_deployment_metadata_generation{job="kube-state-metrics"}
-        for: 5m
-        labels:
-          severity: critical
-        annotations:
-          summary: Deployment of {{$labels.namespace}}/{{$labels.name}} failed
-          description: Deployment of {{$labels.namespace}}/{{$labels.name}} failed - observed generation != intended generation
-      - alert: DeploymentReplicasMismatch
-        expr: kube_deployment_spec_replicas{job="kube-state-metrics"} != kube_deployment_status_availableReplicas{job="kube-state-metrics"}
-        for: 5m
-        labels:
-          severity: critical
-        annotations:
-          summary: Deployment of {{$labels.name}} failed.
-          description: Deployment of {{$labels.namespace}}/{{$labels.name}} failed - observed replicas != intended replicas.
-      - alert: DeploymentReplicasUnavailable
-        expr: kube_deployment_status_replicas_unavailable > 0
-        for: 5m
-        labels:
-          severity: critical
-        annotations:
-          summary: Deployment `{{ $labels.deployment }}` has `{{ $value }}` replica(s) unavailable.
-          description: Deployment  `{{ $labels.deployment }}` has `{{ $value }}` replica(s) unavailable.
-          runbook: https://kubernetes.io/docs/tasks/debug-application-cluster/debug-pod-replication-controller/
-      - alert: PodRestartingTooMuch
-        expr: rate(kube_pod_container_status_restarts[5m])*600 > 2
-        for: 5m
-        labels:
-          severity: warning
-        annotations:
-          summary: Pod `{{ $labels.pod }}` is restarting too much.
-          description: Pod `{{ $labels.namespace }}/{{ $labels.pod }}` is restarting too much.'
-          runbook: https://kubernetes.io/docs/tasks/debug-application-cluster/debug-pod-replication-controller/
   etcd3.rules: |+
     groups:
     - name: etcd.rules
@@ -251,6 +213,37 @@ data:
           description: '{{ $labels.job }}: {{ $labels.namespace }}/{{ $labels.pod }} ({{
             $labels.instance }}) instance will exhaust in file/socket descriptors soon'
           summary: file descriptors soon exhausted
+  job.rules: |+
+    groups:
+    - name: job.rules
+      rules:
+      - alert: CronJobRunning
+        expr: time() -kube_cronjob_next_schedule_time > 3600
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          description: CronJob {{$labels.namespaces}}/{{$labels.cronjob}} is taking more than 1h to complete
+          summary: CronJob didn't finish after 1h
+
+      - alert: JobCompletion
+        expr: kube_job_spec_completions - kube_job_status_succeeded  > 0
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          description: Job completion is taking more than 1h to complete
+            cronjob {{$labels.namespaces}}/{{$labels.job}}
+          summary: Job {{$labels.job}} didn't finish to complete after 1h
+
+      - alert: JobFailed
+        expr: kube_job_status_failed  > 0
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          description: Job {{$labels.namespaces}}/{{$labels.job}} failed to complete
+          summary: Job failed
   kube-apiserver.rules: |+
     groups:
     - name: kube-apiserver.rules
@@ -302,6 +295,66 @@ data:
             to nodes.
           runbook: https://coreos.com/tectonic/docs/latest/troubleshooting/controller-recovery.html#recovering-a-scheduler
           summary: Scheduler is down
+  kube-state-metrics.rules: |+
+    groups:
+    - name: kube-state-metrics.rules
+      rules:
+      - alert: DeploymentGenerationMismatch
+        expr: kube_deployment_status_observed_generation != kube_deployment_metadata_generation
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          description: Observed deployment generation does not match expected one for
+            deployment {{$labels.namespaces}}/{{$labels.deployment}}
+          summary: Deployment is outdated
+      - alert: DeploymentReplicasNotUpdated
+        expr: ((kube_deployment_status_replicas_updated != kube_deployment_spec_replicas)
+          or (kube_deployment_status_replicas_available != kube_deployment_spec_replicas))
+          unless (kube_deployment_spec_paused == 1)
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          description: Replicas are not updated and available for deployment {{$labels.namespaces}}/{{$labels.deployment}}
+          summary: Deployment replicas are outdated
+      - alert: DaemonSetRolloutStuck
+        expr: kube_daemonset_status_number_ready / kube_daemonset_status_desired_number_scheduled
+          * 100 < 100
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          description: Only {{$value}}% of desired pods scheduled and ready for daemon
+            set {{$labels.namespaces}}/{{$labels.daemonset}}
+          summary: DaemonSet is missing pods
+      - alert: K8SDaemonSetsNotScheduled
+        expr: kube_daemonset_status_desired_number_scheduled - kube_daemonset_status_current_number_scheduled
+          > 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          description: A number of daemonsets are not scheduled.
+          summary: Daemonsets are not scheduled correctly
+      - alert: DaemonSetsMissScheduled
+        expr: kube_daemonset_status_number_misscheduled > 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          description: A number of daemonsets are running where they are not supposed
+            to run.
+          summary: Daemonsets are not scheduled correctly
+      - alert: PodFrequentlyRestarting
+        expr: increase(kube_pod_container_status_restarts_total[1h]) > 5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          description: Pod {{$labels.namespaces}}/{{$labels.pod}} is was restarted {{$value}}
+            times within the last hour
+          summary: Pod is restarting frequently
   kubelet.rules: |+
     groups:
     - name: kubelet.rules

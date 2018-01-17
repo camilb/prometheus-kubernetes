@@ -1,0 +1,30 @@
+groups:
+- name: job.rules
+  rules:
+  - alert: CronJobRunning
+    expr: time() -kube_cronjob_next_schedule_time > 3600
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      description: CronJob {{$labels.namespaces}}/{{$labels.cronjob}} is taking more than 1h to complete
+      summary: CronJob didn't finish after 1h
+
+  - alert: JobCompletion
+    expr: kube_job_spec_completions - kube_job_status_succeeded  > 0
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      description: Job completion is taking more than 1h to complete
+        cronjob {{$labels.namespaces}}/{{$labels.job}}
+      summary: Job {{$labels.job}} didn't finish to complete after 1h
+
+  - alert: JobFailed
+    expr: kube_job_status_failed  > 0
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      description: Job {{$labels.namespaces}}/{{$labels.job}} failed to complete
+      summary: Job failed
