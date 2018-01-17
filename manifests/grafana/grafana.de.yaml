@@ -80,6 +80,8 @@ spec:
         volumeMounts:
         - name: grafana-dashboards
           mountPath: /var/grafana-dashboards
+      nodeSelector:
+        node_label_key: node_label_value
       volumes:
       - name: grafana-storage
         emptyDir: {}
