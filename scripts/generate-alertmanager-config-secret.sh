@@ -11,6 +11,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: alertmanager-main
+  namespace: monitoring
 data:
   alertmanager.yaml: $(cat ../assets/alertmanager/alertmanager.yaml | $b64)
 EOF
