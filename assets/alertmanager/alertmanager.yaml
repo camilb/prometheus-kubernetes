@@ -16,7 +16,7 @@ route:
   routes:
   - match:
       alertname: DeadMansSwitch
-    receiver: 'pagerduty'
+    receiver: 'null'
 inhibit_rules:
 - source_match:
     severity: 'critical'
