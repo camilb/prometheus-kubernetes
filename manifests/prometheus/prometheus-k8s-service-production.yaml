@@ -8,7 +8,7 @@ metadata:
   annotations:
     service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0
     service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
-    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:us-east-1:445227032534:certificate/c8160d7f-2c55-4768-84c1-535ff45e1a12
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:us-east-1:445227032534:certificate/23dda86d-97e2-4e8c-a4b5-f2bf4cc5fd1a
     service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
 spec:
   clusterIP: 100.69.230.230
