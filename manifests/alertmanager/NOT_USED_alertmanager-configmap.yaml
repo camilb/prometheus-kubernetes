@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager
+data:
+  config.yml: |-
+    global:
+      resolve_timeout: 5m
+      slack_api_url: 'https://hooks.slack.com/services/your_slack_api_token'
+      smtp_smarthost: 'your_smtp_smarthost:587'
+      smtp_from: 'your_smtp_from'
+      smtp_auth_username: 'your_smtp_user'
+      smtp_auth_password: 'your_smtp_pass'
+    templates:
+    - '/etc/alertmanager/template/*.tmpl'
+    route:
+      group_by: ['alertname', 'cluster', 'service']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 1h
+      receiver: pagerduty
+      routes:
+      - match:
+        alertname: DeadMansSwitch
+      receiver: 'null'
+    inhibit_rules:
+    - source_match:
+        severity: 'critical'
+      target_match:
+        severity: 'warning'
+      equal: ['alertname', 'cluster', 'service']
+    receivers:
+    - name: 'pagerduty'
+      pagerduty_configs:
+      - service_key: c0b77df57db8474a983859a12f0b9901
+    - name: 'null'
