@@ -11,6 +11,7 @@ spec:
   namespaceSelector:
     matchNames:
     - default
-  endpoints:
-  - port: http
-    interval: 30s
+## disabling until we can figure out what valid endpoints should be
+#  endpoints:
+#  - port: http
+#    interval: 30s

@@ -6,11 +6,12 @@ metadata:
     k8s-app: skafos-monitor
 spec:
   selector:
-    matchLabels:
+    matchNames:
       app: skafos-monitor
   namespaceSelector:
     matchNames:
     - default
-  endpoints:
-  - port: 80
-    interval: 30s
+## disabling until we can figure out what valid endpoints should be
+#  endpoints:
+# - targetPort: 8080
+#    interval: 30s

@@ -11,6 +11,7 @@ spec:
   namespaceSelector:
     matchNames:
     - default
-  endpoints:
-  - port: 10001
-    interval: 30s
+## disabling until we can figure out what valid endpoints should be
+#  endpoints:
+#  - targetPort: 10001
+#    interval: 30s
