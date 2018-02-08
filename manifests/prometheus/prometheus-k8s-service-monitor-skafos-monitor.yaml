@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: skafos-monitor
+  labels:
+    k8s-app: skafos-monitor
+spec:
+  selector:
+    matchLabels:
+      app: skafos-monitor
+  namespaceSelector:
+    matchNames:
+    - default
+  endpoints:
+  - port: 80
+    interval: 30s
