@@ -8339,5 +8339,5 @@ data:
         "basicAuth": false,
         "name": "prometheus",
         "type": "prometheus",
-        "url": "http://prometheus-k8s.monitoring.svc:9090"
+        "url": "http://prometheus.metis.wtf"
     }
