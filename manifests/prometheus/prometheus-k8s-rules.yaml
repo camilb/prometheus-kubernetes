@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: prometheus-k8s-rules
+  namespace: monitoring
   labels:
     role: prometheus-rulefiles
     prometheus: k8s
@@ -225,7 +226,7 @@ data:
         annotations:
           description: CronJob {{$labels.namespaces}}/{{$labels.cronjob}} is taking more than 1h to complete
           summary: CronJob didn't finish after 1h
-
+    
       - alert: JobCompletion
         expr: kube_job_spec_completions - kube_job_status_succeeded  > 0
         for: 1h
@@ -235,7 +236,7 @@ data:
           description: Job completion is taking more than 1h to complete
             cronjob {{$labels.namespaces}}/{{$labels.job}}
           summary: Job {{$labels.job}} didn't finish to complete after 1h
-
+    
       - alert: JobFailed
         expr: kube_job_status_failed  > 0
         for: 1h
@@ -409,6 +410,8 @@ data:
     groups:
     - name: kubernetes.rules
       rules:
+      - record: kube_alive_pods
+        expr: sum(kube_pod_status_phase{phase="Running"} == 1) without (endpoint,instance,job,phase,service)
       - record: cluster_namespace_controller_pod_container:spec_memory_limit_bytes
         expr: sum(label_replace(container_spec_memory_limit_bytes{container_name!=""},
           "controller", "$1", "pod_name", "^(.*)-[a-z0-9]+")) BY (cluster, namespace,
