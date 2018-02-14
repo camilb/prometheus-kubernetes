@@ -33,7 +33,7 @@ route:
   routes:
   - match:
       alertname: DeadMansSwitch
-    receiver: 'null'
+    receiver: deadmansswitch
 
   # Match critical alerts, any alerts that do not match, 
   # i.e. severity != critical, fall-back to the
@@ -60,4 +60,7 @@ receivers:
 - name: 'pagerduty-critical'
   pagerduty_configs:
   - service_key: 401bcb421d9c4f5eb98adb6120fd13eb
-- name: 'null'
+#- name: 'null'
+- name: deadmansswitch
+  webhook_configs:
+  - url: https://nosnch.in/d9eb65ee18?m=just+checking+in
