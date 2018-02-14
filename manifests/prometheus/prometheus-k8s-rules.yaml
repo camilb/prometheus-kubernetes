@@ -364,7 +364,7 @@ data:
         expr: kube_node_status_condition{condition="Ready",status="true"} == 0
         for: 1h
         labels:
-          severity: warning
+          severity: critical
         annotations:
           description: The Kubelet on {{ $labels.node }} has not checked in with the API,
             or has set itself to NotReady, for more than an hour
