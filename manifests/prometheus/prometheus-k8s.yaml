@@ -33,6 +33,9 @@ spec:
       memory: PROMETHEUS_MEMORY_REQUEST
   retention: PROMETHEUS_STORAGE_RETENTION
   storage:
+    class: ssd
+    selector:
+    resources:
     volumeClaimTemplate:
       metadata:
         annotations:
