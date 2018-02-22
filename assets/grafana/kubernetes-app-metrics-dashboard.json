@@ -1,34 +1,4 @@
 {
-  "__inputs": [
-    {
-      "name": "DS_PROMETHEUS",
-      "label": "prometheus",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "prometheus",
-      "pluginName": "Prometheus"
-    }
-  ],
-  "__requires": [
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "4.6.3"
-    },
-    {
-      "type": "panel",
-      "id": "graph",
-      "name": "Graph",
-      "version": ""
-    },
-    {
-      "type": "datasource",
-      "id": "prometheus",
-      "name": "Prometheus",
-      "version": "1.0.0"
-    }
-  ],
   "annotations": {
     "list": [
       {
@@ -47,7 +17,7 @@
   "gnetId": 1471,
   "graphTooltip": 1,
   "hideControls": false,
-  "id": null,
+  "id": 13,
   "links": [],
   "refresh": "30s",
   "rows": [
@@ -60,7 +30,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "prometheus",
           "editable": true,
           "error": false,
           "fill": 1,
@@ -163,7 +133,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "prometheus",
           "fill": 1,
           "id": 13,
           "legend": {
@@ -260,7 +230,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "prometheus",
           "fill": 1,
           "id": 14,
           "legend": {
@@ -361,7 +331,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "prometheus",
           "editable": true,
           "error": false,
           "fill": 1,
@@ -460,7 +430,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "prometheus",
           "editable": true,
           "error": false,
           "fill": 1,
@@ -563,7 +533,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "prometheus",
           "editable": true,
           "error": false,
           "fill": 1,
@@ -663,7 +633,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "prometheus",
           "editable": true,
           "error": false,
           "fill": 1,
@@ -766,7 +736,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "prometheus",
           "editable": true,
           "error": false,
           "fill": 1,
@@ -850,7 +820,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "prometheus",
           "editable": true,
           "error": false,
           "fill": 1,
@@ -945,7 +915,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "prometheus",
           "editable": true,
           "error": false,
           "fill": 1,
@@ -1076,7 +1046,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "prometheus",
           "editable": true,
           "error": false,
           "fill": 1,
@@ -1176,7 +1146,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "prometheus",
           "fill": 1,
           "id": 15,
           "legend": {
@@ -1282,7 +1252,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "prometheus",
           "editable": true,
           "error": false,
           "fill": 1,
@@ -1392,8 +1362,11 @@
     "list": [
       {
         "allValue": ".+",
-        "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "current": {
+          "text": "default",
+          "value": "default"
+        },
+        "datasource": "prometheus",
         "hide": 0,
         "includeAll": false,
         "label": null,
@@ -1412,8 +1385,11 @@
       },
       {
         "allValue": ".+",
-        "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "current": {
+          "text": "arke",
+          "value": "arke"
+        },
+        "datasource": "prometheus",
         "hide": 0,
         "includeAll": false,
         "label": null,
