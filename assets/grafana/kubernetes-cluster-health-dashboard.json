@@ -16,7 +16,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "hideControls": false,
-  "id": 12,
+  "id": 50,
   "links": [],
   "refresh": false,
   "rows": [
@@ -2163,5 +2163,5 @@
   },
   "timezone": "",
   "title": "Kubernetes Cluster Health",
-  "version": 3
+  "version": 1
 }

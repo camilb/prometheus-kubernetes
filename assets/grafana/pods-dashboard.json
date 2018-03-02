@@ -17,7 +17,7 @@
   "gnetId": 737,
   "graphTooltip": 0,
   "hideControls": false,
-  "id": 10,
+  "id": 45,
   "links": [],
   "refresh": false,
   "rows": [
@@ -1373,8 +1373,8 @@
       {
         "allValue": null,
         "current": {
-          "text": "monitoring",
-          "value": "monitoring"
+          "text": "All",
+          "value": "$__all"
         },
         "datasource": "prometheus",
         "hide": 0,
@@ -1396,8 +1396,8 @@
       {
         "allValue": null,
         "current": {
-          "text": "node-exporter-gb7d4",
-          "value": "node-exporter-gb7d4"
+          "text": "kube-proxy-ip-172-30-108-30.ec2.internal",
+          "value": "kube-proxy-ip-172-30-108-30.ec2.internal"
         },
         "datasource": "prometheus",
         "hide": 0,
@@ -1472,5 +1472,5 @@
   },
   "timezone": "browser",
   "title": "Pods",
-  "version": 2
+  "version": 1
 }
