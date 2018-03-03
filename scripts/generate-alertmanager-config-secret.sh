@@ -1,9 +1,11 @@
 #!/bin/bash
-os=$(uname)
-if [[ $os == "Darwin" ]]; then
-  b64="base64"
+
+# Check whether the base64 binary is GNU or BSD
+echo "" | base64 --wrap=0 > /dev/null 2>&1
+if [ "$?" -eq 0 ]; then
+    b64="base64 --wrap=0"
 else
-  b64="base64 --wrap=0"
+    b64="base64"
 fi
 
 cat <<-EOF >  ../manifests/alertmanager/alertmanager.cm.yaml
