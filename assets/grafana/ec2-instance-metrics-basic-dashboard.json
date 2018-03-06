@@ -1162,8 +1162,8 @@
       {
         "allValue": null,
         "current": {
-          "text": "i-0a4afca5aedfc564f",
-          "value": "i-0a4afca5aedfc564f"
+          "text": "master-us-east-1a.masters.kubernetes.metismachine.io;i-083559f87ea21d997",
+          "value": "master-us-east-1a.masters.kubernetes.metismachine.io;i-083559f87ea21d997"
         },
         "datasource": "prometheus-ec2",
         "hide": 0,
@@ -1175,7 +1175,7 @@
         "query": "label_values(node_boot_time, instance)",
         "refresh": 1,
         "regex": "",
-        "sort": 0,
+        "sort": 1,
         "tagValuesQuery": "",
         "tags": [],
         "tagsQuery": "",
@@ -1274,5 +1274,5 @@
   },
   "timezone": "browser",
   "title": "EC2 Instance Metrics (Basic)",
-  "version": 18
+  "version": 21
 }
