@@ -99,7 +99,11 @@ else
     #base64 encode the basic-auth and set the secret
     BASIC_AUTH=$(cat ./auth | base64)
     sed -i -e 's/htpasswd/'"$BASIC_AUTH"'/g' ./basic-auth.secret.yaml
-
+    echo
+    echo -e "${BLUE}Creating Ingress"
+    tput sgr0
+    kubectl apply -f ./basic-auth.secret.yaml
+    kubectl apply -f ./ingress.yaml
   fi
 fi
 

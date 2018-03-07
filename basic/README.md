@@ -33,7 +33,7 @@
 
 Clone repository
 
-    git clone github.com/camilb/prometheus-kubernetes && cd prometehus-kubernetes/basic
+    git clone github.com/camilb/prometheus-kubernetes && cd prometheus-kubernetes/basic
 
 Make any desired configuration changes in `configmaps` according to your setup.
 * ./k8s/prometheus/prometheus.cm.yaml

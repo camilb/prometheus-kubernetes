@@ -1,3 +1,16 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: grafana-persistent-storage
+  namespace: monitoring
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: default
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -29,6 +42,9 @@ spec:
       - image: DOCKER_USER/grafana:GRAFANA_VERSION
         name: grafana
         imagePullPolicy: Always
+        volumeMounts:
+        - name: grafana-persistent-storage
+          mountPath: /var/lib/grafana
         ports:
         - containerPort: 3000
         env:
@@ -42,3 +58,7 @@ spec:
             port: 3000
           initialDelaySeconds: 30
           timeoutSeconds: 1
+      volumes:
+      - name: grafana-persistent-storage
+        persistentVolumeClaim:
+          claimName: grafana-persistent-storage
