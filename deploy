@@ -422,9 +422,9 @@ fi
 ######################################################################################################
 #cleanup
 ######################################################################################################
-# echo
-# echo -e "${BLUE}Removing local changes"
-# git checkout -- .
+echo
+echo -e "${BLUE}Removing local changes"
+git checkout -- .
 
 echo
 echo -e "${GREEN}Done"
