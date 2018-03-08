@@ -56,7 +56,10 @@ rules:
 - apiGroups: [""]
   resources:
   - nodes/metrics
-  verbs: ["get"]
+  - endpoints
+  - pods
+  - services
+  verbs: ["get", "list", "watch"]
 - nonResourceURLs: ["/metrics"]
   verbs: ["get"]
 ---
