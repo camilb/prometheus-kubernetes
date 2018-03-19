@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: mongodb-exporter
+  labels:
+    k8s-app: mongodb-exporter
+spec:
+  jobLabel: mongodb-exporter
+  selector:
+    matchLabels:
+      mongodb-exporter: ".*"
+  namespaceSelector:
+    matchNames:
+    - kube-system
+    - monitoring
+    - default
+  endpoints:
+  - port: mongodb-metrics
+    interval: 30s

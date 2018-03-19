@@ -1,0 +1,37 @@
+groups:
+- name: custom.rules
+  rules:
+  - alert: DeploymentGenerationMismatch
+    expr: kube_deployment_status_observed_generation{job="kube-state-metrics"} != kube_deployment_metadata_generation{job="kube-state-metrics"}
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: Deployment of {{$labels.namespace}}/{{$labels.name}} failed
+      description: Deployment of {{$labels.namespace}}/{{$labels.name}} failed - observed generation != intended generation
+  - alert: DeploymentReplicasMismatch
+    expr: kube_deployment_spec_replicas{job="kube-state-metrics"} != kube_deployment_status_availableReplicas{job="kube-state-metrics"}
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: Deployment of {{$labels.name}} failed.
+      description: Deployment of {{$labels.namespace}}/{{$labels.name}} failed - observed replicas != intended replicas.
+  - alert: DeploymentReplicasUnavailable
+    expr: kube_deployment_status_replicas_unavailable > 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: Deployment `{{ $labels.deployment }}` has `{{ $value }}` replica(s) unavailable.
+      description: Deployment  `{{ $labels.deployment }}` has `{{ $value }}` replica(s) unavailable.
+      runbook: https://kubernetes.io/docs/tasks/debug-application-cluster/debug-pod-replication-controller/
+  - alert: PodRestartingTooMuch
+    expr: rate(kube_pod_container_status_restarts[5m])*600 > 2
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: Pod `{{ $labels.pod }}` is restarting too much.
+      description: Pod `{{ $labels.namespace }}/{{ $labels.pod }}` is restarting too much.'
+      runbook: https://kubernetes.io/docs/tasks/debug-application-cluster/debug-pod-replication-controller/

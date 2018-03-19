@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: rabbitmq
+  labels:
+    k8s-app: rabbitmq
+spec:
+  jobLabel: messagequeue
+  selector:
+    matchLabels:
+      app: messagequeue-exporter
+  namespaceSelector:
+    matchNames:
+    - kube-system
+    - monitoring
+    - default
+  endpoints:
+  - port: exporter
+    interval: 30s

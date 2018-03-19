@@ -16,6 +16,8 @@ metadata:
     prometheus: k8s
 spec:
   replicas: 2
+  nodeSelector:
+    cloud.google.com/gke-nodepool: higher-mem
   version: PROMETHEUS_VERSION
   externalUrl: PROMETHEUS_EXTERNAL_URL
   serviceAccountName: prometheus-k8s
