@@ -1,6 +1,6 @@
 global:
   resolve_timeout: 5m
-  slack_api_url: 'https://hooks.slack.com/services/your_slack_api_token'
+  slack_api_url: 'https://hooks.slack.com/services/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'
   smtp_smarthost: 'your_smtp_smarthost:587'
   smtp_from: 'your_smtp_from'
   smtp_auth_username: 'your_smtp_user'
@@ -27,7 +27,7 @@ inhibit_rules:
 receivers:
 - name: 'default-receiver'
   slack_configs:
-  - channel: '#your_slack_channel'
+  - channel: '#tech-status-prod'
     title: '[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] Prometheus Event Notification'
     text: >-
         {{ range .Alerts }}
