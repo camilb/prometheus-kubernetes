@@ -1,0 +1,30 @@
+groups:
+- name: consul.rules
+  rules:
+  - alert: ConsulDown
+    expr: consul_up{job=~".*"} == 0
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      description: "Consul cluster server service isn't healthy"
+      summary: "Consul service is down on {{$labels.pod}}"
+  - alert: RaftPeersMissing
+    expr: min(consul_raft_peers) by (pod, service) < 3
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      description: "Consul member is missing in the cluster"
+      summary: "{{$labels.service}} is missing a Consul cluster member {{$labels.pod}}"
+  - alert: ConsulServiceFailure
+    expr: sum by (node, pod, service, service_id)(consul_catalog_service_node_healthy == 0)
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      description: "Check all consul-related server and agent servers across the entire cluster"
+      summary: "{{$labels.service}} is down on {{$labels.node}}:{{$labels.pod}} is missing a Consul cluster member"
+
+
+

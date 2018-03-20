@@ -56,10 +56,10 @@ inhibit_rules:
 receivers:
 - name: 'pagerduty-warning'
   pagerduty_configs:
-  - service_key: c0b77df57db8474a983859a12f0b9901
+  - service_key: xxxxxxx
 - name: 'pagerduty-critical'
   pagerduty_configs:
-  - service_key: 401bcb421d9c4f5eb98adb6120fd13eb
+  - service_key: xxxxxxx
 #- name: 'null'
 - name: deadmansswitch
   webhook_configs:
