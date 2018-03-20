@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: prometheus-k8s-rules
+  namespace: monitoring
   labels:
     role: prometheus-rulefiles
     prometheus: k8s
@@ -40,6 +41,37 @@ data:
           description: Reloading Alertmanager's configuration has failed for {{ $labels.namespace
             }}/{{ $labels.pod}}.
           summary: Alertmanager configuration reload has failed
+  consul.rules: |+
+    groups:
+    - name: consul.rules
+      rules:
+      - alert: ConsulDown
+        expr: consul_up{job=~".*"} == 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          description: "Consul cluster server service isn't healthy"
+          summary: "Consul service is down on {{$labels.pod}}"
+      - alert: RaftPeersMissing
+        expr: min(consul_raft_peers) by (pod, service) < 3
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          description: "Consul member is missing in the cluster"
+          summary: "{{$labels.service}} is missing a Consul cluster member {{$labels.pod}}"
+      - alert: ConsulServiceFailure
+        expr: sum by (node, pod, service, service_id)(consul_catalog_service_node_healthy == 0)
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          description: "Check all consul-related server and agent servers across the entire cluster"
+          summary: "{{$labels.service}} is down on {{$labels.node}}:{{$labels.pod}} is missing a Consul cluster member"
+    
+    
+    
   etcd3.rules: |+
     groups:
     - name: etcd.rules
@@ -225,9 +257,9 @@ data:
         annotations:
           description: CronJob {{$labels.namespaces}}/{{$labels.cronjob}} is taking more than 1h to complete
           summary: CronJob didn't finish after 1h
-
+    
       - alert: JobCompletion
-        expr: kube_job_spec_completions - kube_job_status_succeeded  > 0
+        expr: (kube_job_spec_completions - kube_job_status_succeeded{job!~"github-user.*"}) > 0
         for: 1h
         labels:
           severity: warning
@@ -235,7 +267,7 @@ data:
           description: Job completion is taking more than 1h to complete
             cronjob {{$labels.namespaces}}/{{$labels.job}}
           summary: Job {{$labels.job}} didn't finish to complete after 1h
-
+    
       - alert: JobFailed
         expr: kube_job_status_failed  > 0
         for: 1h
@@ -259,7 +291,7 @@ data:
           summary: API server unreachable
       - alert: K8SApiServerLatency
         expr: histogram_quantile(0.99, sum(apiserver_request_latencies_bucket{subresource!="log",verb!~"CONNECT|WATCHLIST|WATCH|PROXY"})
-          WITHOUT (instance, resource)) / 1e+06 > 1
+          WITHOUT (instance, resource)) / 1e+06 > 2
         for: 10m
         labels:
           severity: warning
@@ -347,7 +379,7 @@ data:
             to run.
           summary: Daemonsets are not scheduled correctly
       - alert: PodFrequentlyRestarting
-        expr: increase(kube_pod_container_status_restarts_total[1h]) > 5
+        expr: increase(kube_pod_container_status_restarts_total{pod!~"github-user.*"}[1h]) > 5
         for: 10m
         labels:
           severity: warning
@@ -363,7 +395,7 @@ data:
         expr: kube_node_status_condition{condition="Ready",status="true"} == 0
         for: 1h
         labels:
-          severity: warning
+          severity: critical
         annotations:
           description: The Kubelet on {{ $labels.node }} has not checked in with the API,
             or has set itself to NotReady, for more than an hour
@@ -409,6 +441,8 @@ data:
     groups:
     - name: kubernetes.rules
       rules:
+      - record: kube_alive_pods
+        expr: sum(kube_pod_status_phase{phase="Running"} == 1) without (endpoint,instance,job,phase,service)
       - record: cluster_namespace_controller_pod_container:spec_memory_limit_bytes
         expr: sum(label_replace(container_spec_memory_limit_bytes{container_name!=""},
           "controller", "$1", "pod_name", "^(.*)-[a-z0-9]+")) BY (cluster, namespace,
@@ -588,3 +622,33 @@ data:
           description: Reloading Prometheus' configuration has failed for {{ $labels.namespace
             }}/{{ $labels.pod}}.
           summary: Prometheus configuration reload has failed
+  vault.rules: |+
+    groups:
+    - name: vault.rules
+      rules:
+      - alert: VaultAuditLogFailure
+        expr: vault_audit_log_request_failure != 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          description: "Vault cannot write to audit log and all user operations are failing"
+          summary: "{{$labels.job}} on {{$labels.pod}} cannot write to audit log"
+      - alert: VaultSystemLoad
+        expr: vault_runtime_num_goroutines > 50
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          description: "General system load is higher than usual"
+          summary: "{{$labels.pod}}:{{$labels.service}} Goroutines are {{$value}}"
+      - alert: VaultToConsulLatency
+        expr: vault_consul_get > 500
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          description: "It's taking longer than 500ms to perform a GET operation against the Consul backend"
+          summary: "{{$labels.job}} on {{$labels.pod}} is taking {{$value}} to perform a GET to Consul"
+    
+    

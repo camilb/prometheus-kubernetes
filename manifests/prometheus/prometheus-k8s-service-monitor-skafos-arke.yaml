@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: skafos-arke
+  labels:
+    k8s-app: skafos-arke
+spec:
+  selector:
+    matchLabels:
+      app: skafos-arke
+  namespaceSelector:
+    matchNames:
+    - default
+## disabling until we can figure out what valid endpoints should be
+#  endpoints:
+#  - port: http
+#    interval: 30s

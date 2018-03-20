@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: vault
+  labels:
+    k8s-app: vault
+spec:
+  selector:
+    matchLabels:
+      app: vault
+  namespaceSelector:
+    matchNames:
+    - vault
+## disabling until we can figure out what valid endpoints should be
+  endpoints:
+  - port: exporter
+    interval: 5s

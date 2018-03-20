@@ -6,8 +6,8 @@ metadata:
     prometheus: k8s
 spec:
   replicas: 2
-  version: PROMETHEUS_VERSION
-  externalUrl: PROMETHEUS_EXTERNAL_URL
+  version: v2.1.0
+  externalUrl: http://127.0.0.1:9090
   serviceAccountName: prometheus-k8s
   serviceMonitorSelector:
   ruleSelector:

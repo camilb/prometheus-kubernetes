@@ -66,7 +66,7 @@ To remove everything, just execute the `./teardown` script.
 
 ## Updating configurations
 
-  * **update alert rules:** add or change the rules in `assets/prometheus/rules/` and execute `scripts/generate-rules-configmap.sh`. Then apply the changes using `kubectl apply -f manifests/prometheus/prometheus-k8s-rules.yaml -n monitoring`
+  * **update alert rules:** add or change the rules in `assets/prometheus/rules/` and execute `scripts/generate-rules-configmap.sh`. Then apply the changes using `kubectl apply -f manifests/prometheus/prometheus-k8s-rules.yaml -n monitoring`.  Restart the prometheus pods.
   * **update grafana dashboards:** add or change the existing dashboards in `assets/grafana/` and execute `scripts/generate-dashboards-configmap.sh`. Then apply the changes using `kubectl apply -f manifests/grafana/grafana-dashboards.cm.yaml`.
 
 **Note:** all the Grafana dashboards should have names ending in `-dashboard.json`.

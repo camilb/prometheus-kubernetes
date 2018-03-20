@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: skafos-data-engine-server
+  labels:
+    k8s-app: skafos-data-engine-server
+spec:
+  selector:
+    matchLabels:
+      app: skafos-data-engine-server
+  namespaceSelector:
+    matchNames:
+    - default
+## disabling until we can figure out what valid endpoints should be
+#  endpoints:
+#  - targetPort: 10001
+#    interval: 30s

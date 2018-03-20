@@ -12,7 +12,7 @@ groups:
       summary: API server unreachable
   - alert: K8SApiServerLatency
     expr: histogram_quantile(0.99, sum(apiserver_request_latencies_bucket{subresource!="log",verb!~"CONNECT|WATCHLIST|WATCH|PROXY"})
-      WITHOUT (instance, resource)) / 1e+06 > 1
+      WITHOUT (instance, resource)) / 1e+06 > 2
     for: 10m
     labels:
       severity: warning

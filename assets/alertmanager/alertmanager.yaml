@@ -8,15 +8,44 @@ global:
 templates:
 - '/etc/alertmanager/template/*.tmpl'
 route:
+  # The labels by which incoming alerts are grouped together. For example,
+  # multiple alerts coming in for cluster=A and alertname=LatencyHigh would
+  # be batched into a single group.
   group_by: ['alertname', 'cluster', 'service']
+
+  # When a new group of alerts is created by an incoming alert, wait at
+  # least 'group_wait' to send the initial notification.
+  # This way ensures that you get multiple alerts for the same group that start
+  # firing shortly after another are batched together on the first 
+  # notification.
   group_wait: 30s
+
+  # When the first notification was sent, wait 'group_interval' to send a batch
+  # of new alerts that started firing for that group.
   group_interval: 5m
+
+  # If an alert has successfully been sent, wait 'repeat_interval' to
+  # resend them.
   repeat_interval: 1h
-  receiver: default-receiver
+
+  # A default receiver
+  receiver: pagerduty-warning
   routes:
   - match:
       alertname: DeadMansSwitch
-    receiver: 'null'
+    receiver: deadmansswitch
+
+  # Match critical alerts, any alerts that do not match, 
+  # i.e. severity != critical, fall-back to the
+  # parent node and are sent to 'pagerduty-warning'
+  - match:
+      severity: critical
+    receiver: pagerduty-critical
+
+# Inhibition rules allow to mute a set of alerts given that another alert is
+# firing.
+# We use this to mute any warning-level notifications if the same alert is 
+# already critical.
 inhibit_rules:
 - source_match:
     severity: 'critical'
@@ -25,21 +54,13 @@ inhibit_rules:
   # Apply inhibition if the alertname is the same.
   equal: ['alertname', 'cluster', 'service']
 receivers:
-- name: 'default-receiver'
-  slack_configs:
-  - channel: '#your_slack_channel'
-    title: '[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] Prometheus Event Notification'
-    text: >-
-        {{ range .Alerts }}
-           *Alert:* {{ .Annotations.summary }} - `{{ .Labels.severity }}`
-          *Description:* {{ .Annotations.description }}
-          *Graph:* <{{ .GeneratorURL }}|:chart_with_upwards_trend:> *Runbook:* <{{ .Annotations.runbook }}|:spiral_note_pad:>
-          *Details:*
-          {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
-          {{ end }}
-        {{ end }}
-    send_resolved: true
-  email_configs:
-  - to: 'your_alert_email_address'
-    send_resolved: true
-- name: 'null'
+- name: 'pagerduty-warning'
+  pagerduty_configs:
+  - service_key: xxxxxxx
+- name: 'pagerduty-critical'
+  pagerduty_configs:
+  - service_key: xxxxxxx
+#- name: 'null'
+- name: deadmansswitch
+  webhook_configs:
+  - url: https://nosnch.in/d9eb65ee18?m=just+checking+in

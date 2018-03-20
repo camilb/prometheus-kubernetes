@@ -11,7 +11,7 @@ groups:
       summary: CronJob didn't finish after 1h
 
   - alert: JobCompletion
-    expr: kube_job_spec_completions - kube_job_status_succeeded  > 0
+    expr: (kube_job_spec_completions - kube_job_status_succeeded{job!~"github-user.*"}) > 0
     for: 1h
     labels:
       severity: warning

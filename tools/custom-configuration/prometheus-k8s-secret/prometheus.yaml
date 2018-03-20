@@ -1,6 +1,6 @@
 global:
   evaluation_interval: 30s
-  scrape_interval: 30s
+  scrape_interval: 5s
   external_labels: {}
 rule_files:
 - /etc/prometheus/rules/rules-0/*
@@ -12,7 +12,7 @@ scrape_configs:
     namespaces:
       names:
       - monitoring
-  scrape_interval: 30s
+  scrape_interval: 5s
   relabel_configs:
   - action: keep
     source_labels:
@@ -44,7 +44,7 @@ scrape_configs:
     namespaces:
       names:
       - default
-  scrape_interval: 30s
+  scrape_interval: 5s
   scheme: https
   tls_config:
     insecure_skip_verify: false
@@ -91,7 +91,7 @@ scrape_configs:
     namespaces:
       names:
       - kube-system
-  scrape_interval: 30s
+  scrape_interval: 5s
   relabel_configs:
   - action: keep
     source_labels:
@@ -128,7 +128,7 @@ scrape_configs:
     namespaces:
       names:
       - kube-system
-  scrape_interval: 30s
+  scrape_interval: 5s
   relabel_configs:
   - action: keep
     source_labels:
@@ -165,7 +165,7 @@ scrape_configs:
     namespaces:
       names:
       - kube-system
-  scrape_interval: 30s
+  scrape_interval: 5s
   relabel_configs:
   - action: keep
     source_labels:
@@ -202,7 +202,7 @@ scrape_configs:
     namespaces:
       names:
       - kube-system
-  scrape_interval: 30s
+  scrape_interval: 5s
   relabel_configs:
   - action: keep
     source_labels:
@@ -239,7 +239,7 @@ scrape_configs:
     namespaces:
       names:
       - monitoring
-  scrape_interval: 30s
+  scrape_interval: 5s
   relabel_configs:
   - action: keep
     source_labels:
@@ -270,50 +270,13 @@ scrape_configs:
   - target_label: endpoint
     replacement: http-metrics
 - job_name: monitoring/kubelet/0
-  honor_labels: false
-  kubernetes_sd_configs:
-  - role: endpoints
-    namespaces:
-      names:
-      - kube-system
-  scrape_interval: 30s
-  relabel_configs:
-  - action: keep
-    source_labels:
-    - __meta_kubernetes_service_label_k8s_app
-    regex: kubelet
-  - action: keep
-    source_labels:
-    - __meta_kubernetes_endpoint_port_name
-    regex: http-metrics
-  - source_labels:
-    - __meta_kubernetes_namespace
-    target_label: namespace
-  - source_labels:
-    - __meta_kubernetes_pod_name
-    target_label: pod
-  - source_labels:
-    - __meta_kubernetes_service_name
-    target_label: service
-  - source_labels:
-    - __meta_kubernetes_service_name
-    target_label: job
-    replacement: ${1}
-  - source_labels:
-    - __meta_kubernetes_service_label_k8s_app
-    target_label: job
-    regex: (.+)
-    replacement: ${1}
-  - target_label: endpoint
-    replacement: http-metrics
-- job_name: monitoring/kubelet/1
   honor_labels: true
   kubernetes_sd_configs:
   - role: endpoints
     namespaces:
       names:
       - kube-system
-  scrape_interval: 30s
+  scrape_interval: 5s
   relabel_configs:
   - action: keep
     source_labels:
@@ -350,7 +313,7 @@ scrape_configs:
     namespaces:
       names:
       - monitoring
-  scrape_interval: 30s
+  scrape_interval: 5s
   relabel_configs:
   - action: keep
     source_labels:
@@ -387,7 +350,7 @@ scrape_configs:
     namespaces:
       names:
       - monitoring
-  scrape_interval: 30s
+  scrape_interval: 5s
   relabel_configs:
   - action: keep
     source_labels:
@@ -443,6 +406,78 @@ scrape_configs:
     replacement: ${1}
   - target_label: endpoint
     replacement: http
+- job_name: monitoring/consul/0
+  honor_labels: false
+  kubernetes_sd_configs:
+  - role: endpoints
+    namespaces:
+      names:
+      - vault
+  relabel_configs:
+  - action: keep
+    source_labels:
+    - __meta_kubernetes_service_label_k8s_app
+    regex: consul
+  - action: keep
+    source_labels:
+    - __meta_kubernetes_endpoint_port_name
+    regex: exporter
+  - source_labels:
+    - __meta_kubernetes_namespace
+    target_label: namespace
+  - source_labels:
+    - __meta_kubernetes_pod_name
+    target_label: pod
+  - source_labels:
+    - __meta_kubernetes_service_name
+    target_label: service
+  - source_labels:
+    - __meta_kubernetes_service_name
+    target_label: job
+    replacement: ${1}
+  - source_labels:
+    - __meta_kubernetes_service_label_k8s_app
+    target_label: job
+    regex: (.+)
+    replacement: ${1}
+  - target_label: endpoint
+    replacement: consul
+- job_name: monitoring/vault/0
+  honor_labels: false
+  kubernetes_sd_configs:
+  - role: endpoints
+    namespaces:
+      names:
+      - vault
+  relabel_configs:
+  - action: keep
+    source_labels:
+    - __meta_kubernetes_service_label_k8s_app
+    regex: vault
+  - action: keep
+    source_labels:
+    - __meta_kubernetes_endpoint_port_name
+    regex: exporter
+  - source_labels:
+    - __meta_kubernetes_namespace
+    target_label: namespace
+  - source_labels:
+    - __meta_kubernetes_pod_name
+    target_label: pod
+  - source_labels:
+    - __meta_kubernetes_service_name
+    target_label: service
+  - source_labels:
+    - __meta_kubernetes_service_name
+    target_label: job
+    replacement: ${1}
+  - source_labels:
+    - __meta_kubernetes_service_label_k8s_app
+    target_label: job
+    regex: (.+)
+    replacement: ${1}
+  - target_label: endpoint
+    replacement: vault
 alerting:
   alertmanagers:
   - path_prefix: /

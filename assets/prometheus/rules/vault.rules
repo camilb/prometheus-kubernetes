@@ -1,0 +1,29 @@
+groups:
+- name: vault.rules
+  rules:
+  - alert: VaultAuditLogFailure
+    expr: vault_audit_log_request_failure != 0
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      description: "Vault cannot write to audit log and all user operations are failing"
+      summary: "{{$labels.job}} on {{$labels.pod}} cannot write to audit log"
+  - alert: VaultSystemLoad
+    expr: vault_runtime_num_goroutines > 50
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      description: "General system load is higher than usual"
+      summary: "{{$labels.pod}}:{{$labels.service}} Goroutines are {{$value}}"
+  - alert: VaultToConsulLatency
+    expr: vault_consul_get > 500
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      description: "It's taking longer than 500ms to perform a GET operation against the Consul backend"
+      summary: "{{$labels.job}} on {{$labels.pod}} is taking {{$value}} to perform a GET to Consul"
+
+
