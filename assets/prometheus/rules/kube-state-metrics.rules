@@ -49,7 +49,7 @@ groups:
         to run.
       summary: Daemonsets are not scheduled correctly
   - alert: PodFrequentlyRestarting
-    expr: increase(kube_pod_container_status_restarts_total[1h]) > 5
+    expr: increase(kube_pod_container_status_restarts_total{pod!~"github-user.*"}[1h]) > 5
     for: 10m
     labels:
       severity: warning
