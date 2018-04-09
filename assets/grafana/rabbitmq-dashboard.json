@@ -645,6 +645,7 @@
             "alignAsTable": true,
             "avg": false,
             "current": true,
+            "hideEmpty": false,
             "hideZero": true,
             "max": true,
             "min": false,
@@ -668,7 +669,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rabbitmq_queue_messages",
+              "expr": "rabbitmq_queue_messages{queue!~\".*failed-events\"}",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -848,7 +849,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(rabbitmq_queue_messages_ack_total{durable=\"true\"}[$interval])",
+              "expr": "rate(rabbitmq_queue_messages_ack_total[$interval])",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -859,9 +860,9 @@
               "step": 2
             },
             {
-              "expr": "sum(rate(rabbitmq_queue_messages_ack_total{durable=\"true\"}[$interval]))",
+              "expr": "sum(rate(rabbitmq_queue_messages_ack_total[$interval]))",
               "format": "time_series",
-              "intervalFactor": 2,
+              "intervalFactor": 1,
               "legendFormat": "total",
               "refId": "B"
             }
@@ -1319,5 +1320,5 @@
   },
   "timezone": "browser",
   "title": "RabbitMQ Metrics",
-  "version": 15
+  "version": 5
 }

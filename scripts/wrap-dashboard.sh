@@ -11,9 +11,9 @@
 #  * Drop dashboard specification in assets folder:
 #      mv Nodes-1488465802729.json assets/grafana/node-dashboard.json
 #  * Regenerate Grafana configmap:
-#      ./hack/scripts/generate-manifests.sh
+#      ./scripts/generate-manifests.sh
 #  * Apply new configmap:
-#      kubectl -n monitoring apply -f manifests/grafana/grafana-cm.yaml
+#      kubectl -n monitoring replace -f manifests/grafana/grafana-dashboards.cm.yaml
 
 if [ "$#" -ne 1 ]; then
     echo "Usage: $0 path-to-dashboard.json"

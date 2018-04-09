@@ -14,7 +14,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "4.4.1"
+      "version": "4.6.3"
     },
     {
       "type": "panel",
@@ -30,7 +30,17 @@
     }
   ],
   "annotations": {
-    "list": []
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
   },
   "editable": true,
   "gnetId": null,
@@ -136,7 +146,7 @@
           ]
         }
       ],
-      "repeat": null,
+      "repeat": "pod",
       "repeatIteration": null,
       "repeatRowId": null,
       "showTitle": false,
@@ -229,7 +239,7 @@
           ]
         }
       ],
-      "repeat": null,
+      "repeat": "pod",
       "repeatIteration": null,
       "repeatRowId": null,
       "showTitle": false,
@@ -322,7 +332,7 @@
           ]
         }
       ],
-      "repeat": null,
+      "repeat": "pod",
       "repeatIteration": null,
       "repeatRowId": null,
       "showTitle": false,
@@ -362,7 +372,7 @@
         "hide": 0,
         "includeAll": false,
         "label": "Pod",
-        "multi": false,
+        "multi": true,
         "name": "pod",
         "options": [],
         "query": "label_values(kube_pod_info{namespace=~\"$namespace\"}, pod)",
@@ -428,5 +438,5 @@
   },
   "timezone": "browser",
   "title": "Pods",
-  "version": 1
+  "version": 2
 }
