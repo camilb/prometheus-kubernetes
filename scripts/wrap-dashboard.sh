@@ -13,7 +13,7 @@
 #  * Regenerate Grafana configmap:
 #      ./scripts/generate-manifests.sh
 #  * Apply new configmap:
-#      kubectl -n monitoring apply -f manifests/grafana/grafana-dashboards-configmap.yaml
+#      kubectl -n monitoring replace -f manifests/grafana/grafana-dashboards-configmap.yaml
 
 if [ "$#" -ne 1 ]; then
     echo "Usage: $0 path-to-dashboard.json"
