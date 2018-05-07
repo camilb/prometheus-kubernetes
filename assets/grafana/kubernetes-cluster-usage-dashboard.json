@@ -291,6 +291,16 @@
               "metric": "",
               "refId": "A",
               "step": 10
+            },
+            {
+              "expr": "sum (container_fs_usage_bytes{device=~\"^/dev/nvme[0-9]n1$\",id=\"/\",instance=~\"^$Node$\"}) / sum (container_fs_limit_bytes{device=~\"^/dev/nvme[0-9]n1$\",id=\"/\",instance=~\"^$Node$\"}) * 100",
+              "format": "time_series",
+              "interval": "10s",
+              "intervalFactor": 1,
+              "legendFormat": "",
+              "metric": "",
+              "refId": "A",
+              "step": 10
             }
           ],
           "thresholds": "65, 90",
@@ -697,6 +707,14 @@
               "intervalFactor": 1,
               "refId": "A",
               "step": 10
+            },
+            {
+              "expr": "sum (container_fs_usage_bytes{device=~\"^/dev/nvme[0-9]n1$\",id=\"/\",instance=~\"^$Node$\"})",
+              "format": "time_series",
+              "interval": "10s",
+              "intervalFactor": 1,
+              "refId": "A",
+              "step": 10
             }
           ],
           "thresholds": "",
@@ -773,6 +791,14 @@
           "targets": [
             {
               "expr": "sum (container_fs_limit_bytes{device=~\"^/dev/[xv][sv]d[a-z][1-9]$\",id=\"/\",instance=~\"^$Node$\"})",
+              "format": "time_series",
+              "interval": "10s",
+              "intervalFactor": 1,
+              "refId": "A",
+              "step": 10
+            },
+            {
+              "expr": "sum (container_fs_limit_bytes{device=~\"^/dev/nvme[0-9]n1$\",id=\"/\",instance=~\"^$Node$\"})",
               "format": "time_series",
               "interval": "10s",
               "intervalFactor": 1,
