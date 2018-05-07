@@ -299,7 +299,7 @@
               "intervalFactor": 1,
               "legendFormat": "",
               "metric": "",
-              "refId": "A",
+              "refId": "B",
               "step": 10
             }
           ],
@@ -713,7 +713,7 @@
               "format": "time_series",
               "interval": "10s",
               "intervalFactor": 1,
-              "refId": "A",
+              "refId": "B",
               "step": 10
             }
           ],
@@ -802,7 +802,7 @@
               "format": "time_series",
               "interval": "10s",
               "intervalFactor": 1,
-              "refId": "A",
+              "refId": "B",
               "step": 10
             }
           ],
