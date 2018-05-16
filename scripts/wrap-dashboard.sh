@@ -11,7 +11,7 @@
 #  * Drop dashboard specification in assets folder:
 #      mv Nodes-1488465802729.json assets/grafana/node-dashboard.json
 #  * Regenerate Grafana configmap:
-#      ./scripts/generate-manifests.sh
+#      ./scripts/generate-dashboards-configmap.sh
 #  * Apply new configmap:
 #      kubectl -n monitoring replace -f manifests/grafana/grafana-dashboards.cm.yaml
 
@@ -42,4 +42,3 @@ cat <<EOF
   "overwrite": true
 }
 EOF
-
