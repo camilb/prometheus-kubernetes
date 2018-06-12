@@ -238,7 +238,7 @@ data:
 
       - alert: JobFailed
         expr: kube_job_status_failed  > 0
-        for: 1h
+        for: 5m
         labels:
           severity: warning
         annotations:
