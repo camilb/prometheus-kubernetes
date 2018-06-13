@@ -8927,9 +8927,96 @@ data:
       "gnetId": 22,
       "graphTooltip": 0,
       "id": null,
-      "iteration": 1525786756825,
+      "iteration": 1528879222390,
       "links": [],
       "panels": [
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "${DS_PROMETHEUS}",
+          "fill": 1,
+          "gridPos": {
+            "h": 6,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 12,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "max": true,
+            "min": false,
+            "rightSide": true,
+            "show": true,
+            "sideWidth": null,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "sum (container_memory_working_set_bytes{image!=\"\",name=~\"^k8s_.*\",instance=~\"^$server_ip:4194$\"}) by (pod_name)",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{pod_name}}",
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Pods Memory",
+          "tooltip": {
+            "shared": false,
+            "sort": 2,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "decbytes",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        },
         {
           "alerting": {},
           "aliasColors": {},
@@ -8945,7 +9032,7 @@ data:
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 0
+            "y": 6
           },
           "id": 3,
           "legend": {
@@ -8971,8 +9058,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr":
-                "100 - (avg by (cpu) (irate(node_cpu_seconds_total{mode=\"idle\", instance=\"$server\"}[5m])) * 100)",
+              "expr": "100 - (avg by (cpu) (irate(node_cpu_seconds_total{mode=\"idle\", instance=\"$server\"}[5m])) * 100)",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 10,
@@ -9037,7 +9123,7 @@ data:
             "h": 7,
             "w": 12,
             "x": 12,
-            "y": 0
+            "y": 6
           },
           "id": 9,
           "legend": {
@@ -9143,7 +9229,7 @@ data:
             "h": 7,
             "w": 18,
             "x": 0,
-            "y": 7
+            "y": 13
           },
           "id": 4,
           "legend": {
@@ -9178,8 +9264,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr":
-                "node_memory_MemTotal_bytes{instance=\"$server\"} - node_memory_MemFree_bytes{instance=\"$server\"} - node_memory_Buffers_bytes{instance=\"$server\"} - node_memory_SwapCached_bytes{instance=\"$server\"}",
+              "expr": "node_memory_MemTotal_bytes{instance=\"$server\"} - node_memory_MemFree_bytes{instance=\"$server\"} - node_memory_Buffers_bytes{instance=\"$server\"} - node_memory_SwapCached_bytes{instance=\"$server\"}",
               "format": "time_series",
               "hide": false,
               "interval": "",
@@ -9263,7 +9348,11 @@ data:
           "cacheTimeout": null,
           "colorBackground": false,
           "colorValue": false,
-          "colors": ["rgba(50, 172, 45, 0.97)", "rgba(237, 129, 40, 0.89)", "rgba(245, 54, 54, 0.9)"],
+          "colors": [
+            "rgba(50, 172, 45, 0.97)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(245, 54, 54, 0.9)"
+          ],
           "datasource": "${DS_PROMETHEUS}",
           "editable": true,
           "error": false,
@@ -9279,7 +9368,7 @@ data:
             "h": 7,
             "w": 6,
             "x": 18,
-            "y": 7
+            "y": 13
           },
           "id": 5,
           "interval": null,
@@ -9318,8 +9407,7 @@ data:
           "tableColumn": "",
           "targets": [
             {
-              "expr":
-                "((node_memory_MemTotal_bytes{instance=\"$server\"} - node_memory_MemFree_bytes{instance=\"$server\"}  - node_memory_Buffers_bytes{instance=\"$server\"} - node_memory_Cached_bytes{instance=\"$server\"}) / node_memory_MemTotal_bytes{instance=\"$server\"}) * 100",
+              "expr": "((node_memory_MemTotal_bytes{instance=\"$server\"} - node_memory_MemFree_bytes{instance=\"$server\"}  - node_memory_Buffers_bytes{instance=\"$server\"} - node_memory_Cached_bytes{instance=\"$server\"}) / node_memory_MemTotal_bytes{instance=\"$server\"}) * 100",
               "format": "time_series",
               "intervalFactor": 2,
               "refId": "A",
@@ -9355,7 +9443,7 @@ data:
             "h": 7,
             "w": 18,
             "x": 0,
-            "y": 14
+            "y": 20
           },
           "id": 6,
           "legend": {
@@ -9404,8 +9492,7 @@ data:
               "target": ""
             },
             {
-              "expr":
-                "sum by (instance) (rate(node_disk_written_bytes_total{instance=\"$server\"}[2m]))",
+              "expr": "sum by (instance) (rate(node_disk_written_bytes_total{instance=\"$server\"}[2m]))",
               "format": "time_series",
               "intervalFactor": 4,
               "legendFormat": "written",
@@ -9413,8 +9500,7 @@ data:
               "step": 20
             },
             {
-              "expr":
-                "sum by (instance) (rate(node_disk_io_time_seconds_total{instance=\"$server\"}[2m]))",
+              "expr": "sum by (instance) (rate(node_disk_io_time_seconds_total{instance=\"$server\"}[2m]))",
               "format": "time_series",
               "intervalFactor": 4,
               "legendFormat": "io time",
@@ -9467,7 +9553,11 @@ data:
           "cacheTimeout": null,
           "colorBackground": false,
           "colorValue": false,
-          "colors": ["rgba(50, 172, 45, 0.97)", "rgba(237, 129, 40, 0.89)", "rgba(245, 54, 54, 0.9)"],
+          "colors": [
+            "rgba(50, 172, 45, 0.97)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(245, 54, 54, 0.9)"
+          ],
           "datasource": "${DS_PROMETHEUS}",
           "editable": true,
           "error": false,
@@ -9483,7 +9573,7 @@ data:
             "h": 7,
             "w": 6,
             "x": 18,
-            "y": 14
+            "y": 20
           },
           "id": 7,
           "interval": null,
@@ -9522,8 +9612,7 @@ data:
           "tableColumn": "",
           "targets": [
             {
-              "expr":
-                "(sum(node_filesystem_size_bytes{device!=\"rootfs\",instance=\"$server\"}) - sum(node_filesystem_free_bytes{device!=\"rootfs\",instance=\"$server\"})) / sum(node_filesystem_size_bytes{device!=\"rootfs\",instance=\"$server\"})",
+              "expr": "(sum(node_filesystem_size_bytes{device!=\"rootfs\",instance=\"$server\"}) - sum(node_filesystem_free_bytes{device!=\"rootfs\",instance=\"$server\"})) / sum(node_filesystem_size_bytes{device!=\"rootfs\",instance=\"$server\"})",
               "format": "time_series",
               "intervalFactor": 2,
               "refId": "A",
@@ -9559,7 +9648,7 @@ data:
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 21
+            "y": 27
           },
           "id": 8,
           "legend": {
@@ -9656,7 +9745,7 @@ data:
             "h": 7,
             "w": 12,
             "x": 12,
-            "y": 21
+            "y": 27
           },
           "id": 10,
           "legend": {
@@ -9687,8 +9776,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr":
-                "rate(node_network_transmit_bytes_total{instance=\"$server\",device!~\"lo\"}[5m])",
+              "expr": "rate(node_network_transmit_bytes_total{instance=\"$server\",device!~\"lo\"}[5m])",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
@@ -9776,7 +9864,7 @@ data:
             "multi": false,
             "name": "server_ip",
             "options": [],
-            "query": "label_values(node_boot_time, instance)",
+            "query": "label_values(node_boot_time_seconds, instance)",
             "refresh": 1,
             "regex": "/^(.*?):/",
             "sort": 0,
@@ -9793,15 +9881,35 @@ data:
         "to": "now"
       },
       "timepicker": {
-        "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"],
-        "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
+        "refresh_intervals": [
+          "5s",
+          "10s",
+          "30s",
+          "1m",
+          "5m",
+          "15m",
+          "30m",
+          "1h",
+          "2h",
+          "1d"
+        ],
+        "time_options": [
+          "5m",
+          "15m",
+          "1h",
+          "6h",
+          "12h",
+          "24h",
+          "2d",
+          "7d",
+          "30d"
+        ]
       },
       "timezone": "browser",
       "title": "Nodes",
       "uid": "D2AKiz7mz",
-      "version": 3
-    }
-    ,
+      "version": 1
+    },
       "inputs": [
         {
           "name": "DS_PROMETHEUS",
@@ -9863,7 +9971,7 @@ data:
       "gnetId": null,
       "graphTooltip": 1,
       "id": null,
-      "iteration": 1525787218263,
+      "iteration": 1528894336252,
       "links": [],
       "panels": [
         {
@@ -9878,7 +9986,7 @@ data:
           "grid": {},
           "gridPos": {
             "h": 7,
-            "w": 24,
+            "w": 12,
             "x": 0,
             "y": 0
           },
@@ -9902,14 +10010,16 @@ data:
           "pointradius": 5,
           "points": false,
           "renderer": "flot",
+          "repeat": "pod",
+          "repeatDirection": "v",
           "seriesOverrides": [],
           "spaceLength": 10,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
-              "expr":
-                "sum by(container_name) (container_memory_usage_bytes{pod_name=\"$pod\", container_name=~\"$container\", container_name!=\"POD\"})",
+              "expr": "sum by(container_name) (container_memory_usage_bytes{pod_name=\"$pod\", container_name=~\"$container\", container_name!=\"POD\"})",
+              "format": "time_series",
               "interval": "10s",
               "intervalFactor": 1,
               "legendFormat": "Current: {{ container_name }}",
@@ -9918,8 +10028,8 @@ data:
               "step": 15
             },
             {
-              "expr":
-                "kube_pod_container_resource_requests_memory_bytes{pod=\"$pod\", container=~\"$container\"}",
+              "expr": "kube_pod_container_resource_requests_memory_bytes{pod=\"$pod\", container=~\"$container\"}",
+              "format": "time_series",
               "interval": "10s",
               "intervalFactor": 2,
               "legendFormat": "Requested: {{ container }}",
@@ -10005,14 +10115,15 @@ data:
           "pointradius": 5,
           "points": false,
           "renderer": "flot",
+          "repeat": "pod",
+          "repeatDirection": "v",
           "seriesOverrides": [],
           "spaceLength": 10,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
-              "expr":
-                "sum by (container_name)( rate(container_cpu_usage_seconds_total{image!=\"\",container_name!=\"POD\",pod_name=\"$pod\"}[1m] ) )",
+              "expr": "sum by (container_name)( rate(container_cpu_usage_seconds_total{image!=\"\",container_name!=\"POD\",pod_name=\"$pod\"}[1m] ) )",
               "intervalFactor": 2,
               "legendFormat": "{{ container_name }}",
               "refId": "A",
@@ -10096,14 +10207,16 @@ data:
           "pointradius": 5,
           "points": false,
           "renderer": "flot",
+          "repeat": "pod",
+          "repeatDirection": "v",
           "seriesOverrides": [],
           "spaceLength": 10,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
-              "expr":
-                "sort_desc(sum by (pod_name) (rate (container_network_receive_bytes_total{pod_name=\"$pod\"}[1m]) ))",
+              "expr": "sort_desc(sum by (pod_name) (rate (container_network_receive_bytes_total{pod_name=\"$pod\"}[1m]) ))",
+              "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{ pod_name }}",
               "refId": "A",
@@ -10207,8 +10320,7 @@ data:
             "multi": false,
             "name": "container",
             "options": [],
-            "query":
-              "label_values(kube_pod_container_info{namespace=\"$namespace\", pod=\"$pod\"}, container)",
+            "query": "label_values(kube_pod_container_info{namespace=\"$namespace\", pod=\"$pod\"}, container)",
             "refresh": 1,
             "regex": "",
             "sort": 0,
@@ -10221,19 +10333,39 @@ data:
         ]
       },
       "time": {
-        "from": "now-6h",
+        "from": "now-3h",
         "to": "now"
       },
       "timepicker": {
-        "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"],
-        "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
+        "refresh_intervals": [
+          "5s",
+          "10s",
+          "30s",
+          "1m",
+          "5m",
+          "15m",
+          "30m",
+          "1h",
+          "2h",
+          "1d"
+        ],
+        "time_options": [
+          "5m",
+          "15m",
+          "1h",
+          "6h",
+          "12h",
+          "24h",
+          "2d",
+          "7d",
+          "30d"
+        ]
       },
       "timezone": "browser",
       "title": "Pods",
       "uid": "asAFiznmk",
-      "version": 1
-    }
-    ,
+      "version": 2
+    },
       "inputs": [
         {
           "name": "DS_PROMETHEUS",
