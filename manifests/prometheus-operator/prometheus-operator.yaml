@@ -23,10 +23,10 @@ spec:
         resources:
           limits:
             cpu: 200m
-            memory: 100Mi
+            memory: 300Mi
           requests:
             cpu: 100m
-            memory: 50Mi
+            memory: 100Mi
       serviceAccountName: prometheus-operator
       nodeSelector:
         node_label_key: node_label_value

@@ -1,0 +1,11 @@
+groups:
+- name: pods.rules
+  rules:
+  - alert: MemoryLimit
+    expr: irate(container_memory_failcnt{container_name!=""}[5m]) > 1
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      description: Pod {{$labels.namespaces}}/{{$labels.pod}} reached the memory limit.
+      summary: Memory limit reached

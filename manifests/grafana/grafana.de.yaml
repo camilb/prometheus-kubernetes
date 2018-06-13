@@ -7,7 +7,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 5Gi
+      storage: 1Gi
   storageClassName: ssd
 ---
 apiVersion: apps/v1beta1
@@ -21,6 +21,8 @@ spec:
       labels:
         app: grafana
     spec:
+      securityContext:
+        fsGroup: 472
       containers:
       - name: grafana
         image: grafana/grafana:GRAFANA_VERSION
@@ -44,6 +46,7 @@ spec:
           mountPath: /var/grafana-storage
         - name: grafana-persistent-storage
           mountPath: /var/lib/grafana
+          subPath: grafana
         ports:
         - name: web
           containerPort: 3000

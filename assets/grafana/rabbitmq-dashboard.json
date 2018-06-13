@@ -20,7 +20,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "4.6.3"
+      "version": "5.1.1"
     },
     {
       "type": "panel",
@@ -32,7 +32,7 @@
       "type": "datasource",
       "id": "prometheus",
       "name": "Prometheus",
-      "version": "1.0.0"
+      "version": "5.0.0"
     },
     {
       "type": "panel",
@@ -54,7 +54,8 @@
       }
     ]
   },
-  "description": "Basic rabbitmq host stats: Node Stats, Exchanges, Channels, Consumers,  Connections, Queues, Messages, Messages per Queue, Memory, File Descriptors, Sockets.",
+  "description":
+    "Basic rabbitmq host stats: Node Stats, Exchanges, Channels, Consumers,  Connections, Queues, Messages, Messages per Queue, Memory, File Descriptors, Sockets.",
   "editable": true,
   "gnetId": 4371,
   "graphTooltip": 0,
@@ -172,20 +173,14 @@
             "conditions": [
               {
                 "evaluator": {
-                  "params": [
-                    1
-                  ],
+                  "params": [1],
                   "type": "lt"
                 },
                 "operator": {
                   "type": "and"
                 },
                 "query": {
-                  "params": [
-                    "A",
-                    "10s",
-                    "now"
-                  ]
+                  "params": ["A", "10s", "now"]
                 },
                 "reducer": {
                   "params": [],
@@ -202,11 +197,7 @@
                   "type": "and"
                 },
                 "query": {
-                  "params": [
-                    "A",
-                    "10s",
-                    "now"
-                  ]
+                  "params": ["A", "10s", "now"]
                 },
                 "reducer": {
                   "params": [],
@@ -598,20 +589,14 @@
             "conditions": [
               {
                 "evaluator": {
-                  "params": [
-                    10
-                  ],
+                  "params": [10],
                   "type": "gt"
                 },
                 "operator": {
                   "type": "and"
                 },
                 "query": {
-                  "params": [
-                    "A",
-                    "5m",
-                    "now"
-                  ]
+                  "params": ["A", "5m", "now"]
                 },
                 "reducer": {
                   "params": [],
@@ -1294,29 +1279,8 @@
     "to": "now"
   },
   "timepicker": {
-    "refresh_intervals": [
-      "5s",
-      "10s",
-      "30s",
-      "1m",
-      "5m",
-      "15m",
-      "30m",
-      "1h",
-      "2h",
-      "1d"
-    ],
-    "time_options": [
-      "5m",
-      "15m",
-      "1h",
-      "6h",
-      "12h",
-      "24h",
-      "2d",
-      "7d",
-      "30d"
-    ]
+    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"],
+    "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
   },
   "timezone": "browser",
   "title": "RabbitMQ Metrics",
