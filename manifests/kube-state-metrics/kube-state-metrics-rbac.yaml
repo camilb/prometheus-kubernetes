@@ -10,6 +10,8 @@ metadata:
 rules:
 - apiGroups: [""]
   resources:
+  - configmaps
+  - secrets
   - nodes
   - pods
   - services
