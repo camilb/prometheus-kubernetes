@@ -403,7 +403,7 @@ echo
 echo -e "${ORANGE}Deploying Prometheus"
 tput sgr0
 #generate prometheus rules
-(cd ./scripts; ./generate-rules-configmap.sh)
+(cd ./scripts; ./generate-prometheus-rules.sh)
 
 #deploy prometheus
 kubectl apply -f manifests/prometheus/prometheus-k8s-rbac.yaml
