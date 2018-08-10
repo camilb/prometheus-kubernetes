@@ -344,6 +344,7 @@ until kctl get customresourcedefinitions alertmanagers.monitoring.coreos.com > /
 until kctl get servicemonitors.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
 until kctl get prometheuses.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
 until kctl get alertmanagers.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
+until kctl get prometheusrules.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
 echo "done!"
 
 #alertmanager
