@@ -1,15 +1,14 @@
 #!/bin/bash
 
 cat <<-EOF > ../manifests/prometheus/prometheus-k8s-rules.yaml
-apiVersion: v1
-kind: ConfigMap
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
 metadata:
-  name: prometheus-k8s-rules
-  namespace: monitoring
   labels:
-    role: prometheus-rulefiles
     prometheus: k8s
-data:
+    role: alert-rules
+  name: prometheus-k8s-rules
+  spec:
 EOF
 
 for f in ../assets/prometheus/rules/*.rules

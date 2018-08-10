@@ -344,6 +344,7 @@ until kctl get customresourcedefinitions alertmanagers.monitoring.coreos.com > /
 until kctl get servicemonitors.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
 until kctl get prometheuses.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
 until kctl get alertmanagers.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
+until kctl get prometheusrules.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
 echo "done!"
 
 #alertmanager
@@ -402,7 +403,7 @@ echo
 echo -e "${ORANGE}Deploying Prometheus"
 tput sgr0
 #generate prometheus rules
-(cd ./scripts; ./generate-rules-configmap.sh)
+(cd ./scripts; ./generate-prometheus-rules.sh)
 
 #deploy prometheus
 kubectl apply -f manifests/prometheus/prometheus-k8s-rbac.yaml
