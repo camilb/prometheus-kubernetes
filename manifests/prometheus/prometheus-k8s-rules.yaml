@@ -1,12 +1,11 @@
-apiVersion: v1
-kind: ConfigMap
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
 metadata:
-  name: prometheus-k8s-rules
   labels:
-    role: prometheus-rulefiles
     prometheus: k8s
-data:
-  alertmanager.rules: |+
+    role: alert-rules
+  name: prometheus-k8s-rules
+  spec:
     groups:
     - name: alertmanager.rules
       rules:
@@ -225,7 +224,7 @@ data:
         annotations:
           description: CronJob {{$labels.namespaces}}/{{$labels.cronjob}} is taking more than 1h to complete
           summary: CronJob didn't finish after 1h
-
+    
       - alert: JobCompletion
         expr: kube_job_spec_completions - kube_job_status_succeeded  > 0
         for: 1h
@@ -235,10 +234,10 @@ data:
           description: Job completion is taking more than 1h to complete
             cronjob {{$labels.namespaces}}/{{$labels.job}}
           summary: Job {{$labels.job}} didn't finish to complete after 1h
-
+    
       - alert: JobFailed
         expr: kube_job_status_failed  > 0
-        for: 5m
+        for: 1h
         labels:
           severity: warning
         annotations:
@@ -575,6 +574,18 @@ data:
         annotations:
           summary: "{{$labels.instance}}: High memory usage detected"
           description: "{{$labels.instance}}: Memory usage is above 90% (current value is: {{ $value }})"
+  pods.rules: |+
+    groups:
+    - name: pods.rules
+      rules:
+      - alert: MemoryLimit
+        expr: irate(container_memory_failcnt{container_name!=""}[5m]) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          description: Pod {{$labels.namespaces}}/{{$labels.pod}} reached the memory limit.
+          summary: Memory limit reached
   prometheus.rules: |+
     groups:
     - name: prometheus.rules
