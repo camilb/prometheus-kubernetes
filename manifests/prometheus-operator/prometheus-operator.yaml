@@ -1,4 +1,4 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   labels:
@@ -6,6 +6,9 @@ metadata:
   name: prometheus-operator
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: prometheus-operator
   template:
     metadata:
       labels:
@@ -28,6 +31,9 @@ spec:
           requests:
             cpu: 100m
             memory: 50Mi
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
       serviceAccountName: prometheus-operator
       nodeSelector:
         node_label_key: node_label_value
