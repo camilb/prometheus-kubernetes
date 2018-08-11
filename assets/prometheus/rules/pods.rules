@@ -1,4 +1,3 @@
-groups:
 - name: pods.rules
   rules:
   - alert: MemoryLimit

@@ -1,4 +1,3 @@
-groups:
 - name: prometheus.rules
   rules:
   - alert: FailedReload

@@ -8,11 +8,11 @@ metadata:
     prometheus: k8s
     role: alert-rules
   name: prometheus-k8s-rules
-  spec:
+spec:
+  groups:
 EOF
 
 for f in ../assets/prometheus/rules/*.rules
 do
-  echo "  $(basename $f): |+" >> ../manifests/prometheus/prometheus-k8s-rules.yaml
-  cat $f | sed "s/^/    /g" >> ../manifests/prometheus/prometheus-k8s-rules.yaml
+  cat $f | sed "s/^/  /g" >> ../manifests/prometheus/prometheus-k8s-rules.yaml
 done

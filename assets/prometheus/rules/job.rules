@@ -1,4 +1,3 @@
-groups:
 - name: job.rules
   rules:
   - alert: CronJobRunning

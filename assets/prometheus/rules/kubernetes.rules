@@ -1,4 +1,3 @@
-groups:
 - name: kubernetes.rules
   rules:
   - record: cluster_namespace_controller_pod_container:spec_memory_limit_bytes

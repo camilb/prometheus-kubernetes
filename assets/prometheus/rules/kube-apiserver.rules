@@ -1,4 +1,3 @@
-groups:
 - name: kube-apiserver.rules
   rules:
   - alert: K8SApiserverDown

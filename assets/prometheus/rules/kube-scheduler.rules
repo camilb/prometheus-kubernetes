@@ -1,4 +1,3 @@
-groups:
 - name: kube-scheduler.rules
   rules:
   - alert: K8SSchedulerDown

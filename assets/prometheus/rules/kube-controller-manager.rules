@@ -1,4 +1,3 @@
-groups:
 - name: kube-controller.rules
   rules:
   - alert: K8SControllerManagerDown

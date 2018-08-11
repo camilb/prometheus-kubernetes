@@ -1,4 +1,3 @@
-groups:
 - name: alertmanager.rules
   rules:
   - alert: AlertmanagerConfigInconsistent

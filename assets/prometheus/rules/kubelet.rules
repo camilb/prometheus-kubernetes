@@ -1,4 +1,3 @@
-groups:
 - name: kubelet.rules
   rules:
   - alert: K8SNodeNotReady

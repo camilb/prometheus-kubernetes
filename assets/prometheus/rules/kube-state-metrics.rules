@@ -1,4 +1,3 @@
-groups:
 - name: kube-state-metrics.rules
   rules:
   - alert: DeploymentGenerationMismatch

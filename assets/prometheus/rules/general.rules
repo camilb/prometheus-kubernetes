@@ -1,4 +1,3 @@
-groups:
 - name: general.rules
   rules:
   - alert: TargetDown
