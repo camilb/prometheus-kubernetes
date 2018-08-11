@@ -62,6 +62,12 @@ spec:
         - mountPath: /grafana-dashboard-definitions/0/statefulset
           name: grafana-dashboard-statefulset
           readOnly: false
+        - mountPath: /grafana-dashboard-definitions/0/deployments
+          name: grafana-dashboard-deployments
+          readOnly: false
+        - mountPath: /grafana-dashboard-definitions/0/k8s-cluster-usage
+          name: grafana-dashboard-k8s-cluster-usage
+          readOnly: false
       securityContext:
         runAsNonRoot: true
         runAsUser: 65534
@@ -101,3 +107,9 @@ spec:
       - configMap:
           name: grafana-dashboard-statefulset
         name: grafana-dashboard-statefulset
+      - configMap:
+          name: grafana-dashboard-deployments
+        name: grafana-dashboard-deployments
+      - configMap:
+          name: grafana-dashboard-k8s-cluster-usage
+        name: grafana-dashboard-k8s-cluster-usage
