@@ -370,9 +370,6 @@ echo
 echo -e "${ORANGE}Deploying Grafana"
 tput sgr0
 
-#generate grafana dashboards configmap
-(cd ./scripts; ./generate-dashboards-configmap.sh)
-
 kctl apply -f manifests/grafana
 
 echo
