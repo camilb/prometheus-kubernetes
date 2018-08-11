@@ -377,7 +377,7 @@ kctl apply -f manifests/grafana
 
 echo
 echo -e "${ORANGE}Grafana default credentials"
-echo -e "${White}user: ${ORANGE}admin, ${White}password: ${ORANGE}admin"
+echo -e "${WHITE}user: ${ORANGE}admin, ${WHITE}password: ${ORANGE}admin"
 tput sgr0
 
 #prometheus
