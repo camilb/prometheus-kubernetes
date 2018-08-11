@@ -108,9 +108,6 @@ do
             read -p "Y/N [N]: " use_aks
             if [[ $use_aks =~ ^([yY][eE][sS]|[yY])$ ]]; then
               echo "Remove rules for self hosted clusters"
-              rm assets/prometheus/rules//kube-apiserver.rules
-              rm assets/prometheus/rules//kube-controller-manager.rules
-              rm assets/prometheus/rules//kube-scheduler.rules
               echo
             fi
             sed -i -e 's,type,'kind',g' manifests/prometheus/prometheus-k8s.yaml;
