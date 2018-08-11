@@ -1,7 +1,7 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: grafana-persistent-storage
+  name: grafana-storage
 spec:
   accessModes:
     - ReadWriteOnce
@@ -10,87 +10,106 @@ spec:
       storage: 1Gi
   storageClassName: ssd
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
+  labels:
+    app: grafana
   name: grafana
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
   template:
     metadata:
       labels:
         app: grafana
     spec:
-      securityContext:
-        fsGroup: 472
       containers:
-      - name: grafana
-        image: grafana/grafana:GRAFANA_VERSION
-        env:
-        - name: GF_AUTH_BASIC_ENABLED
-          value: "true"
-        - name: GF_AUTH_ANONYMOUS_ENABLED
-          value: "true"
-        - name: GF_SECURITY_ADMIN_USER
-          valueFrom:
-            secretKeyRef:
-              name: grafana-credentials
-              key: user
-        - name: GF_SECURITY_ADMIN_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: grafana-credentials
-              key: password
-        volumeMounts:
-        - name: grafana-storage
-          mountPath: /var/grafana-storage
-        - name: grafana-persistent-storage
-          mountPath: /var/lib/grafana
-          subPath: grafana
+      - image: grafana/grafana:GRAFANA_VERSION
+        name: grafana
         ports:
-        - name: web
-          containerPort: 3000
+        - containerPort: 3000
+          name: http
         resources:
-          requests:
-            memory: 100Mi
-            cpu: 100m
           limits:
-            memory: 200Mi
             cpu: 200m
-      - name: grafana-watcher
-        image: quay.io/coreos/grafana-watcher:v0.0.8
-        args:
-          - '--watch-dir=/var/grafana-dashboards'
-          - '--grafana-url=http://localhost:3000'
-        env:
-        - name: GRAFANA_USER
-          valueFrom:
-            secretKeyRef:
-              name: grafana-credentials
-              key: user
-        - name: GRAFANA_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: grafana-credentials
-              key: password
-        resources:
+            memory: 200Mi
           requests:
-            memory: "16Mi"
-            cpu: "50m"
-          limits:
-            memory: "32Mi"
-            cpu: "100m"
+            cpu: 100m
+            memory: 100Mi
         volumeMounts:
-        - name: grafana-dashboards
-          mountPath: /var/grafana-dashboards
-      nodeSelector:
-        node_label_key: node_label_value
-      volumes:
-      - name: grafana-storage
-        emptyDir: {}
-      - name: grafana-persistent-storage
-        persistentVolumeClaim:
-          claimName: grafana-persistent-storage
-      - name: grafana-dashboards
-        configMap:
+        - mountPath: /var/lib/grafana
+          subPath: grafana
+          name: grafana-storage
+          readOnly: false
+        - mountPath: /etc/grafana/provisioning/datasources
+          name: grafana-datasources
+          readOnly: false
+        - mountPath: /etc/grafana/provisioning/dashboards
           name: grafana-dashboards
+          readOnly: false
+        - mountPath: /grafana-dashboard-definitions/0/k8s-cluster-rsrc-use
+          name: grafana-dashboard-k8s-cluster-rsrc-use
+          readOnly: false
+        - mountPath: /grafana-dashboard-definitions/0/k8s-node-rsrc-use
+          name: grafana-dashboard-k8s-node-rsrc-use
+          readOnly: false
+        - mountPath: /grafana-dashboard-definitions/0/k8s-resources-cluster
+          name: grafana-dashboard-k8s-resources-cluster
+          readOnly: false
+        - mountPath: /grafana-dashboard-definitions/0/k8s-resources-namespace
+          name: grafana-dashboard-k8s-resources-namespace
+          readOnly: false
+        - mountPath: /grafana-dashboard-definitions/0/k8s-resources-pod
+          name: grafana-dashboard-k8s-resources-pod
+          readOnly: false
+        - mountPath: /grafana-dashboard-definitions/0/nodes
+          name: grafana-dashboard-nodes
+          readOnly: false
+        - mountPath: /grafana-dashboard-definitions/0/pods
+          name: grafana-dashboard-pods
+          readOnly: false
+        - mountPath: /grafana-dashboard-definitions/0/statefulset
+          name: grafana-dashboard-statefulset
+          readOnly: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        fsGroup: 472
+      serviceAccountName: grafana
+      volumes:
+      - persistentVolumeClaim:
+          claimName: grafana-storage
+        name: grafana-storage
+      - name: grafana-datasources
+        configMap:
+          name: grafana-datasources
+      - configMap:
+          name: grafana-dashboards
+        name: grafana-dashboards
+      - configMap:
+          name: grafana-dashboard-k8s-cluster-rsrc-use
+        name: grafana-dashboard-k8s-cluster-rsrc-use
+      - configMap:
+          name: grafana-dashboard-k8s-node-rsrc-use
+        name: grafana-dashboard-k8s-node-rsrc-use
+      - configMap:
+          name: grafana-dashboard-k8s-resources-cluster
+        name: grafana-dashboard-k8s-resources-cluster
+      - configMap:
+          name: grafana-dashboard-k8s-resources-namespace
+        name: grafana-dashboard-k8s-resources-namespace
+      - configMap:
+          name: grafana-dashboard-k8s-resources-pod
+        name: grafana-dashboard-k8s-resources-pod
+      - configMap:
+          name: grafana-dashboard-nodes
+        name: grafana-dashboard-nodes
+      - configMap:
+          name: grafana-dashboard-pods
+        name: grafana-dashboard-pods
+      - configMap:
+          name: grafana-dashboard-statefulset
+        name: grafana-dashboard-statefulset

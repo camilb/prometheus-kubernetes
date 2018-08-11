@@ -91,9 +91,7 @@ do
             if [[ $use_gke =~ ^([yY][eE][sS]|[yY])$ ]]; then
               echo "Grant cluster-admin permissions to your current identity"
               echo "Remove rules for self hosted clusters"
-              rm assets/prometheus/rules//kube-apiserver.rules
-              rm assets/prometheus/rules//kube-controller-manager.rules
-              rm assets/prometheus/rules//kube-scheduler.rules
+
               echo
               kubectl create clusterrolebinding admin-binding --clusterrole=cluster-admin --user=$(gcloud config get-value core/account)
             fi
@@ -372,31 +370,15 @@ echo
 echo -e "${ORANGE}Deploying Grafana"
 tput sgr0
 
-#grafana administrator username
-read -p "Enter Grafana administrator username [admin]: " GRAFANA_ADMIN_USERNAME
-GRAFANA_ADMIN_USERNAME=${GRAFANA_ADMIN_USERNAME:-admin}
-
-#grafana administrator password
-prompt="Enter Grafana administrator password: "
-while IFS= read -p "$prompt" -r -s -n 1 char
-do
-    if [[ $char == $'\0' ]]
-    then
-        break
-    fi
-    prompt='*'
-    grafana_admin_password+="$char"
-done
-
-echo
-
-#create grafana credentials secret
-kctl create secret generic grafana-credentials --from-literal=user=$GRAFANA_ADMIN_USERNAME --from-literal=password=$grafana_admin_password
-
 #generate grafana dashboards configmap
 (cd ./scripts; ./generate-dashboards-configmap.sh)
 
 kctl apply -f manifests/grafana
+
+echo
+echo -e "${ORANGE}Grafana default credentials"
+echo -e "${White}user: ${ORANGE}admin, ${White}password: ${ORANGE}admin"
+tput sgr0
 
 #prometheus
 echo
