@@ -7347,7 +7347,6 @@ items:
   metadata:
     name: grafana-dashboard-statefulset
     namespace: monitoring
-kind: ConfigMapList
 - apiVersion: v1
   data:
     deployments.json: |-
@@ -7417,7 +7416,7 @@ kind: ConfigMapList
               "rgba(237, 129, 40, 0.89)",
               "rgba(50, 172, 45, 0.97)"
             ],
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "$datasource",
             "editable": true,
             "error": false,
             "format": "none",
@@ -7499,7 +7498,7 @@ kind: ConfigMapList
               "rgba(237, 129, 40, 0.89)",
               "rgba(50, 172, 45, 0.97)"
             ],
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "$datasource",
             "editable": true,
             "error": false,
             "format": "none",
@@ -7581,7 +7580,7 @@ kind: ConfigMapList
               "rgba(237, 129, 40, 0.89)",
               "rgba(50, 172, 45, 0.97)"
             ],
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "$datasource",
             "editable": true,
             "error": false,
             "format": "Bps",
@@ -7663,7 +7662,7 @@ kind: ConfigMapList
               "rgba(237, 129, 40, 0.89)",
               "rgba(50, 172, 45, 0.97)"
             ],
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "$datasource",
             "decimals": null,
             "editable": true,
             "error": false,
@@ -7747,7 +7746,7 @@ kind: ConfigMapList
               "rgba(237, 129, 40, 0.89)",
               "rgba(50, 172, 45, 0.97)"
             ],
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "$datasource",
             "editable": true,
             "error": false,
             "format": "none",
@@ -7829,7 +7828,7 @@ kind: ConfigMapList
               "rgba(237, 129, 40, 0.89)",
               "rgba(50, 172, 45, 0.97)"
             ],
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "$datasource",
             "editable": true,
             "error": false,
             "format": "none",
@@ -7912,7 +7911,7 @@ kind: ConfigMapList
               "rgba(237, 129, 40, 0.89)",
               "rgba(50, 172, 45, 0.97)"
             ],
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "$datasource",
             "editable": true,
             "error": false,
             "format": "none",
@@ -7991,7 +7990,7 @@ kind: ConfigMapList
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "$datasource",
             "editable": true,
             "error": false,
             "fill": 1,
@@ -8113,7 +8112,7 @@ kind: ConfigMapList
             {
               "allValue": ".*",
               "current": {},
-              "datasource": "${DS_PROMETHEUS}",
+              "datasource": "$datasource",
               "hide": 0,
               "includeAll": false,
               "label": "Namespace",
@@ -8133,7 +8132,7 @@ kind: ConfigMapList
             {
               "allValue": null,
               "current": {},
-              "datasource": "${DS_PROMETHEUS}",
+              "datasource": "$datasource",
               "hide": 0,
               "includeAll": false,
               "label": "Deployment",
@@ -8151,6 +8150,78 @@ kind: ConfigMapList
               "useTags": false
             }
           ]
+        },
+        "templating": {
+            "list": [
+                {
+                    "current": {
+                        "text": "Prometheus",
+                        "value": "Prometheus"
+                    },
+                    "hide": 0,
+                    "label": null,
+                    "name": "datasource",
+                    "options": [
+
+                    ],
+                    "query": "prometheus",
+                    "refresh": 1,
+                    "regex": "",
+                    "type": "datasource"
+                },
+                {
+                    "allValue": null,
+                    "current": {
+
+                    },
+                    "datasource": "$datasource",
+                    "hide": 0,
+                    "includeAll": false,
+                    "label": "Namespace",
+                    "multi": false,
+                    "name": "deployment_namespace",
+                    "options": [
+
+                    ],
+                    "query": "label_values(kube_deployment_metadata_generation{job=\"kube-state-metrics\"}, namespace)",
+                    "refresh": 2,
+                    "regex": "",
+                    "sort": 0,
+                    "tagValuesQuery": "",
+                    "tags": [
+
+                    ],
+                    "tagsQuery": "",
+                    "type": "query",
+                    "useTags": false
+                },
+                {
+                    "allValue": null,
+                    "current": {
+
+                    },
+                    "datasource": "$datasource",
+                    "hide": 0,
+                    "includeAll": false,
+                    "label": "Name",
+                    "multi": false,
+                    "name": "deployment_name",
+                    "options": [
+
+                    ],
+                    "query": "label_values(kube_deployment_metadata_generation{namespace=\"$deployment_namespace\"}, deployment)",
+                    "refresh": 2,
+                    "regex": "",
+                    "sort": 0,
+                    "tagValuesQuery": "",
+                    "tags": [
+
+                    ],
+                    "tagsQuery": "",
+                    "type": "query",
+                    "useTags": false
+                }
+            ]
         },
         "time": {
           "from": "now-6h",
@@ -8190,7 +8261,6 @@ kind: ConfigMapList
   metadata:
     name: grafana-dashboard-deployments
     namespace: monitoring
-kind: ConfigMapList
 - apiVersion: v1
   data:
     k8s-cluster-usage.json: |-
@@ -8261,7 +8331,7 @@ kind: ConfigMapList
               "rgba(237, 129, 40, 0.89)",
               "rgba(245, 54, 54, 0.9)"
             ],
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "$datasource",
             "editable": true,
             "error": false,
             "format": "percent",
@@ -8347,7 +8417,7 @@ kind: ConfigMapList
               "rgba(237, 129, 40, 0.89)",
               "rgba(245, 54, 54, 0.9)"
             ],
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "$datasource",
             "decimals": 2,
             "editable": true,
             "error": false,
@@ -8433,7 +8503,7 @@ kind: ConfigMapList
               "rgba(237, 129, 40, 0.89)",
               "rgba(245, 54, 54, 0.9)"
             ],
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "$datasource",
             "decimals": 2,
             "editable": true,
             "error": false,
@@ -8521,7 +8591,7 @@ kind: ConfigMapList
               "rgba(237, 129, 40, 0.89)",
               "rgba(245, 54, 54, 0.9)"
             ],
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "$datasource",
             "decimals": 2,
             "editable": true,
             "error": false,
@@ -8608,7 +8678,7 @@ kind: ConfigMapList
               "rgba(237, 129, 40, 0.89)",
               "rgba(245, 54, 54, 0.9)"
             ],
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "$datasource",
             "decimals": 2,
             "editable": true,
             "error": false,
@@ -8694,7 +8764,7 @@ kind: ConfigMapList
               "rgba(237, 129, 40, 0.89)",
               "rgba(245, 54, 54, 0.9)"
             ],
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "$datasource",
             "decimals": 2,
             "editable": true,
             "error": false,
@@ -8780,7 +8850,7 @@ kind: ConfigMapList
               "rgba(237, 129, 40, 0.89)",
               "rgba(245, 54, 54, 0.9)"
             ],
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "$datasource",
             "decimals": 2,
             "editable": true,
             "error": false,
@@ -8866,7 +8936,7 @@ kind: ConfigMapList
               "rgba(237, 129, 40, 0.89)",
               "rgba(245, 54, 54, 0.9)"
             ],
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "$datasource",
             "decimals": 2,
             "editable": true,
             "error": false,
@@ -8952,7 +9022,7 @@ kind: ConfigMapList
               "rgba(237, 129, 40, 0.89)",
               "rgba(245, 54, 54, 0.9)"
             ],
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "$datasource",
             "decimals": 2,
             "editable": true,
             "error": false,
@@ -9034,7 +9104,7 @@ kind: ConfigMapList
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "$datasource",
             "decimals": 2,
             "editable": true,
             "error": false,
@@ -9143,7 +9213,7 @@ kind: ConfigMapList
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "$datasource",
             "decimals": 3,
             "editable": true,
             "error": false,
@@ -9241,7 +9311,7 @@ kind: ConfigMapList
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "$datasource",
             "decimals": 2,
             "editable": true,
             "error": false,
@@ -9338,7 +9408,7 @@ kind: ConfigMapList
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "$datasource",
             "decimals": 2,
             "editable": true,
             "error": false,
@@ -9448,28 +9518,50 @@ kind: ConfigMapList
           "kubernetes"
         ],
         "templating": {
-          "list": [
-            {
-              "allValue": ".*",
-              "current": {},
-              "datasource": "${DS_PROMETHEUS}",
-              "hide": 0,
-              "includeAll": true,
-              "label": null,
-              "multi": false,
-              "name": "Node",
-              "options": [],
-              "query": "label_values(machine_cpu_cores,instance)",
-              "refresh": 1,
-              "regex": "",
-              "sort": 0,
-              "tagValuesQuery": "",
-              "tags": [],
-              "tagsQuery": "",
-              "type": "query",
-              "useTags": false
-            }
-          ]
+            "list": [
+                {
+                    "current": {
+                        "text": "Prometheus",
+                        "value": "Prometheus"
+                    },
+                    "hide": 0,
+                    "label": null,
+                    "name": "datasource",
+                    "options": [
+
+                    ],
+                    "query": "prometheus",
+                    "refresh": 1,
+                    "regex": "",
+                    "type": "datasource"
+                },
+                {
+                    "allValue": null,
+                    "current": {
+
+                    },
+                    "datasource": "$datasource",
+                    "hide": 0,
+                    "includeAll": false,
+                    "label": null,
+                    "multi": false,
+                    "name": "Node",
+                    "options": [
+
+                    ],
+                    "query": "label_values(machine_cpu_cores,instance)",
+                    "refresh": 1,
+                    "regex": "",
+                    "sort": 0,
+                    "tagValuesQuery": "",
+                    "tags": [
+
+                    ],
+                    "tagsQuery": "",
+                    "type": "query",
+                    "useTags": false
+                }
+            ]
         },
         "time": {
           "from": "now-5m",
