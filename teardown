@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+ORANGE='\033[0;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+GREEN_PS3=$'\e[0;32m'
+ORANGE_PS3=$'\e[0;33m'
+WHITE='\033[0;37m'
 
 if [ -z "${KUBECONFIG}" ]; then
     export KUBECONFIG=~/.kube/config
@@ -14,7 +22,7 @@ kctl() {
 
 kctl delete -f manifests/node-exporter
 kctl delete -f manifests/kube-state-metrics
-kctl delete -f manifests/grafana
+find manifests/grafana -type f ! -name grafana.pvc.yaml -exec kubectl --namespace "$NAMESPACE" delete -f {} \;
 find manifests/prometheus -type f ! -name prometheus-k8s-rbac.yaml -exec kubectl --namespace "$NAMESPACE" delete -f {} \;
 kubectl delete -f manifests/prometheus/prometheus-k8s-rbac.yaml
 kctl delete -f manifests/alertmanager
@@ -36,3 +44,8 @@ kubectl delete clusterrolebinding admin-binding
 #delete created custom resource definitions
 
 kubectl get crd -o 'jsonpath={.items[*].metadata.name}' | xargs -n 1 | fgrep coreos.com | xargs kubectl delete crd
+
+#manually remove persistent volumes instructions
+echo -e "${GREEN}The persistent volumes for Grafana and Prometeus were not removed!"
+echo -e "${GREEN}To remove them, please run te following command:"
+echo -e "${WHITE}kubectl get pvc -n ${NAMESPACE} | grep 'grafana\|prometheus' | cut -d " "  -f 1 | xargs -n 1 kubectl delete pvc -n ${NAMESPACE}"
