@@ -8992,7 +8992,7 @@ items:
             "tableColumn": "",
             "targets": [
               {
-                "expr": "sum (container_fs_usage_bytes{device=~\"^/dev/[xv][sv]d[a-z][1-9]$\",id=\"/\",instance=~\"^$Node$\"})",
+                "expr": "sum (container_fs_usage_bytes{device=~"^/dev/[nsx][v][bdm][a-z].+$",id="/",id=\"/\",instance=~\"^$Node$\"})",
                 "format": "time_series",
                 "interval": "10s",
                 "intervalFactor": 1,
@@ -9078,7 +9078,7 @@ items:
             "tableColumn": "",
             "targets": [
               {
-                "expr": "sum (container_fs_limit_bytes{device=~\"^/dev/[xv][sv]d[a-z][1-9]$\",id=\"/\",instance=~\"^$Node$\"})",
+                "expr": "sum (container_fs_limit_bytes{device=~"^/dev/[nsx][v][bdm][a-z].+$",id="/",id=\"/\",instance=~\"^$Node$\"})",
                 "format": "time_series",
                 "interval": "10s",
                 "intervalFactor": 1,
