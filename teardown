@@ -53,7 +53,7 @@ kubectl get crd -o 'jsonpath={.items[*].metadata.name}' | xargs -n 1 | fgrep cor
 #manually remove persistent volumes instructions
 echo -e "${GREEN}The persistent volumes for Grafana and Prometeus were not removed!"
 echo -e "${GREEN}To remove them, please run te following command:"
-echo -e "${WHITE}kubectl get pvc -n ${NAMESPACE} | grep 'grafana\|prometheus' | cut -d " "  -f 1 | xargs -n 1 kubectl delete pvc -n ${NAMESPACE}"
+echo -e "${WHITE}kubectl get pvc -n ${NAMESPACE} | grep 'grafana\|prometheus' | cut -d '" "'  -f 1 | xargs -n 1 kubectl delete pvc -n ${NAMESPACE}"
 
 #clean sed generated files
 find . -name "*.yaml-e" -exec rm -rf {} \;
