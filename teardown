@@ -12,13 +12,17 @@ if [ -z "${KUBECONFIG}" ]; then
     export KUBECONFIG=~/.kube/config
 fi
 
-if [ -z "${NAMESPACE}" ]; then
-    NAMESPACE=monitoring
-fi
+#Namespace
+NAMESPACE=$(kubectl get sts --all-namespaces | grep prometheus-k8s | cut -d " " -f1)
 
 kctl() {
     kubectl --namespace "$NAMESPACE" "$@"
 }
+
+#Set namespace in various resources
+for n in $(egrep -lir --include=*.{yaml,sh} "CUSTOM_NAMESPACE" .); do
+  sed -i -e 's,CUSTOM_NAMESPACE,'"$NAMESPACE"',g' $n
+done
 
 kctl delete -f manifests/node-exporter
 kctl delete -f manifests/kube-state-metrics
@@ -31,7 +35,8 @@ kubectl delete -f manifests/k8s/self-hosted
 # Hack: wait a bit to let the controller delete the deployed Prometheus server.
 sleep 5
 
-kctl delete -f manifests/prometheus-operator
+find manifests/prometheus-operator -type f ! -name prometheus-operator-cluster-role-binding.yaml -exec kubectl --namespace "$NAMESPACE" delete -f {} \;
+kubectl delete -f manifests/prometheus-operator/prometheus-operator-cluster-role-binding.yaml
 
 kctl delete secret grafana-credentials
 
@@ -48,4 +53,9 @@ kubectl get crd -o 'jsonpath={.items[*].metadata.name}' | xargs -n 1 | fgrep cor
 #manually remove persistent volumes instructions
 echo -e "${GREEN}The persistent volumes for Grafana and Prometeus were not removed!"
 echo -e "${GREEN}To remove them, please run te following command:"
-echo -e "${WHITE}kubectl get pvc -n ${NAMESPACE} | grep 'grafana\|prometheus' | cut -d " "  -f 1 | xargs -n 1 kubectl delete pvc -n ${NAMESPACE}"
+echo -e "${WHITE}kubectl get pvc -n ${NAMESPACE} | grep 'grafana\|prometheus' | cut -d '" "'  -f 1 | xargs -n 1 kubectl delete pvc -n ${NAMESPACE}"
+
+#clean sed generated files
+find . -name "*.yaml-e" -exec rm -rf {} \;
+
+git checkout -- .

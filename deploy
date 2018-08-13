@@ -14,6 +14,7 @@ NODE_EXPORTER_DEFAULT_VERSION=v0.16.0
 KUBE_STATE_METRICS_DEFAULT_VERSION=v1.3.1
 NODE_LABEL_DEFAULT_KEY=beta.kubernetes.io/monit
 NODE_LABEL_DEFAULT_VALUE=prometheus
+DEFAULT_NAMESPACE=monitoring
 
 #########################################################################################
 #external Urls for Prometheus and Alertmanager
@@ -36,10 +37,6 @@ if [ -z "${KUBECONFIG}" ]; then
     export KUBECONFIG=~/.kube/config
 fi
 
-if [ -z "${NAMESPACE}" ]; then
-    NAMESPACE=monitoring
-fi
-
 #check for uncommitted changes
 echo -e "${ORANGE}Check for uncommitted changes"
 echo
@@ -54,11 +51,18 @@ else
   tput sgr0
 fi
 
-echo
-echo -e "${BLUE}Creating ${ORANGE}'monitoring' ${BLUE}namespace."
+#Namespace
+read -p "Enter desired namespace to deploy prometheus [$DEFAULT_NAMESPACE]: " NAMESPACE
+NAMESPACE=${NAMESPACE:-$DEFAULT_NAMESPACE}
 tput sgr0
+
+echo -e "${BLUE}Creating ${ORANGE}${NAMESPACE} ${BLUE}namespace."
 kubectl create namespace "$NAMESPACE"
-echo
+
+#Set namespace in various resources
+for n in $(egrep -lir --include=*.{yaml,sh} "CUSTOM_NAMESPACE" .); do
+  sed -i -e 's,CUSTOM_NAMESPACE,'"$NAMESPACE"',g' $n
+done
 
 kctl() {
     kubectl --namespace "$NAMESPACE" "$@"

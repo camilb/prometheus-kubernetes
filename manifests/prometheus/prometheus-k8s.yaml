@@ -45,6 +45,6 @@ spec:
             storage: PROMETHEUS_STORAGE_VOLUME_SIZE
   alerting:
     alertmanagers:
-    - namespace: monitoring
+    - namespace: CUSTOM_NAMESPACE
       name: alertmanager-main
       port: web

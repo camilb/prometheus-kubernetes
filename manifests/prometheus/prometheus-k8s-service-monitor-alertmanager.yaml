@@ -10,7 +10,7 @@ spec:
       alertmanager: main
   namespaceSelector:
     matchNames:
-    - monitoring
+    - CUSTOM_NAMESPACE
   endpoints:
   - port: web
     interval: 30s

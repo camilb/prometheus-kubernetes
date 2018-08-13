@@ -11,7 +11,7 @@ spec:
       k8s-app: node-exporter
   namespaceSelector:
     matchNames:
-    - monitoring
+    - CUSTOM_NAMESPACE
   endpoints:
   - port: http-metrics
     interval: 30s
