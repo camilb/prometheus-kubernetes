@@ -12,7 +12,7 @@ spec:
       provider: kubernetes
   namespaceSelector:
     matchNames:
-    - kube-system
+    - default
   endpoints:
   - port: https
     interval: 30s

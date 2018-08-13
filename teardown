@@ -20,10 +20,9 @@ kctl() {
 }
 
 #Set namespace in various resources
-sed -i -e 's,CUSTOM_NAMESPACE,'"$NAMESPACE"',g' manifests/kube-state-metrics/kube-state-metrics-rbac.yaml
-sed -i -e 's,CUSTOM_NAMESPACE,'"$NAMESPACE"',g' manifests/prometheus/prometheus-k8s-rbac.yaml
-sed -i -e 's,CUSTOM_NAMESPACE,'"$NAMESPACE"',g' manifests/prometheus/prometheus-k8s.yaml
-sed -i -e 's,CUSTOM_NAMESPACE,'"$NAMESPACE"',g' manifests/prometheus-operator/prometheus-operator-cluster-role-binding.yaml
+for n in $(egrep -lir --include=*.{yaml,sh} "CUSTOM_NAMESPACE" .); do
+  sed -i -e 's,CUSTOM_NAMESPACE,'"$NAMESPACE"',g' $n
+done
 
 kctl delete -f manifests/node-exporter
 kctl delete -f manifests/kube-state-metrics
