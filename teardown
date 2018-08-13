@@ -36,7 +36,8 @@ kubectl delete -f manifests/k8s/self-hosted
 # Hack: wait a bit to let the controller delete the deployed Prometheus server.
 sleep 5
 
-kctl delete -f manifests/prometheus-operator
+find manifests/prometheus-operator -type f ! -name prometheus-operator-cluster-role-binding.yaml -exec kubectl --namespace "$NAMESPACE" delete -f {} \;
+kubectl delete -f manifests/prometheus-operator/prometheus-operator-cluster-role-binding.yaml
 
 kctl delete secret grafana-credentials
 
