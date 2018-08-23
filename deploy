@@ -33,6 +33,9 @@ PURPLE='\033[0;35m'
 GREEN_PS3=$'\e[0;32m'
 ORANGE_PS3=$'\e[0;33m'
 WHITE='\033[0;37m'
+if [ -z "${KUBECONFIG}" ]; then
+    export KUBECONFIG=~/.kube/config
+fi
 
 #check for uncommitted changes
 echo -e "${ORANGE}Check for uncommitted changes"
