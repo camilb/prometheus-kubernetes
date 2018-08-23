@@ -8,4 +8,4 @@ spec:
   resources:
     requests:
       storage: 1Gi
-  storageClassName: ssd
+  storageClassName: STORAGE_CLASS_TYPE

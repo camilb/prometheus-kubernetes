@@ -15,6 +15,7 @@ KUBE_STATE_METRICS_DEFAULT_VERSION=v1.3.1
 NODE_LABEL_DEFAULT_KEY=beta.kubernetes.io/monit
 NODE_LABEL_DEFAULT_VALUE=prometheus
 DEFAULT_NAMESPACE=monitoring
+KUBECONFIG_FILE=config
 
 #########################################################################################
 #external Urls for Prometheus and Alertmanager
@@ -34,7 +35,7 @@ GREEN_PS3=$'\e[0;32m'
 ORANGE_PS3=$'\e[0;33m'
 WHITE='\033[0;37m'
 if [ -z "${KUBECONFIG}" ]; then
-    export KUBECONFIG=~/.kube/config
+    export DEFAULT_KUBECONFIG=~/.kube/KUBECONFIG_FILE
 fi
 
 #check for uncommitted changes
@@ -50,6 +51,9 @@ else
   echo -e "${GREEN}OK! ${WHITE}No uncommitted changes detected"
   tput sgr0
 fi
+#kube config file
+read -p "Enter kube config file [$DEFAULT_KUBECONFIG]: " KUBECONFIG
+KUBECONFIG=${KUBECONFIG:-$DEFAULT_KUBECONFIG}
 
 #Namespace
 read -p "Enter desired namespace to deploy prometheus [$DEFAULT_NAMESPACE]: " NAMESPACE
@@ -82,6 +86,7 @@ do
             STORAGE_CLASS_TYPE=gp2
             sed -i -e 's,STORAGE_CLASS_PROVISIONER,'"$STORAGE_CLASS_PROVISIONER"',g' manifests/prometheus/prometheus-k8s.yaml;
             sed -i -e 's,STORAGE_CLASS_TYPE,'"$STORAGE_CLASS_TYPE"',g' manifests/prometheus/prometheus-k8s.yaml;
+            sed -i -e 's,STORAGE_CLASS_TYPE,'"$STORAGE_CLASS_TYPE"',g' manifests/grafana/grafana.pvc.yaml;
             break
             ;;
         "GCP")
