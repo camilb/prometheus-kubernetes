@@ -1,7 +1,7 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: ssd
+  name: STORAGE_CLASS_TYPE
 provisioner: STORAGE_CLASS_PROVISIONER
 parameters:
   type: STORAGE_CLASS_TYPE
@@ -31,7 +31,7 @@ spec:
       memory: PROMETHEUS_MEMORY_REQUEST
   retention: PROMETHEUS_STORAGE_RETENTION
   storage:
-    class: ssd
+    class: STORAGE_CLASS_TYPE
     selector:
     resources:
     volumeClaimTemplate:
@@ -39,7 +39,7 @@ spec:
         annotations:
           annotation1: prometheus
       spec:
-        storageClassName: ssd
+        storageClassName: STORAGE_CLASS_TYPE
         resources:
           requests:
             storage: PROMETHEUS_STORAGE_VOLUME_SIZE
