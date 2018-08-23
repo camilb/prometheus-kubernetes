@@ -121,8 +121,9 @@ do
             ;;
         "Custom")
             echo "Deploying on custom providers without persistence"
-            sed -i -e '1,10d;34,47d' manifests/prometheus/prometheus-k8s.yaml;
-            sed -i -e '1,12d;47,49d;91,93d' manifests/grafana/grafana.de.yaml;
+            sed -i -e '1,8d;32,45d' manifests/prometheus/prometheus-k8s.yaml;
+            rm -rf manifests/grafana/grafana.pvc.yaml
+            sed -i -e '31,34d;77,79d' manifests/grafana/grafana.de.yaml;
             break
             ;;
         *) echo invalid option;;
