@@ -12,6 +12,11 @@ if [ -z "${KUBECONFIG}" ]; then
     export KUBECONFIG=~/.kube/config
 fi
 
+#Create a temporary/working directory and copy files into it.
+rm -fr .tmp && mkdir .tmp
+cp -r assets manifests scripts tools deploy teardown .tmp
+cd .tmp
+
 #Namespace
 NAMESPACE=$(kubectl get sts --all-namespaces | grep prometheus-k8s | cut -d " " -f1)
 
@@ -55,7 +60,6 @@ echo -e "${GREEN}The persistent volumes for Grafana and Prometeus were not remov
 echo -e "${GREEN}To remove them, please run te following command:"
 echo -e "${WHITE}kubectl get pvc -n ${NAMESPACE} | grep 'grafana\|prometheus' | cut -d '" "'  -f 1 | xargs -n 1 kubectl delete pvc -n ${NAMESPACE}"
 
-#clean sed generated files
-find . -name "*.yaml-e" -exec rm -rf {} \;
-
-git checkout -- .
+#cleanup
+cd ..
+rm -r .tmp
