@@ -30,6 +30,10 @@ spec:
     requests:
       memory: PROMETHEUS_MEMORY_REQUEST
   retention: PROMETHEUS_STORAGE_RETENTION
+  securityContext:
+    fsGroup: 2000
+    runAsNonRoot: true
+    runAsUser: 1000
   storage:
     class: STORAGE_CLASS_TYPE
     selector:
