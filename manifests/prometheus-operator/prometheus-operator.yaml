@@ -18,7 +18,7 @@ spec:
       - args:
         - --kubelet-service=kube-system/kubelet
         - --config-reloader-image=quay.io/coreos/configmap-reload:v0.0.1
-        - --prometheus-config-reloader=quay.io/coreos/prometheus-config-reloader:v0.23.0
+        - --prometheus-config-reloader=quay.io/coreos/prometheus-config-reloader:v0.29.0
         image: quay.io/coreos/prometheus-operator:PROMETHEUS_OPERATOR_VERSION
         name: prometheus-operator
         ports:
@@ -32,6 +32,7 @@ spec:
             cpu: 100m
             memory: 50Mi
       securityContext:
+        fsGroup: 2000
         runAsNonRoot: true
         runAsUser: 65534
       serviceAccountName: prometheus-operator
