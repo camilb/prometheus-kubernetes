@@ -1,4 +1,4 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   labels:
@@ -6,6 +6,9 @@ metadata:
   name: prometheus-operator
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: prometheus-operator
   template:
     metadata:
       labels:
@@ -15,6 +18,7 @@ spec:
       - args:
         - --kubelet-service=kube-system/kubelet
         - --config-reloader-image=quay.io/coreos/configmap-reload:v0.0.1
+        - --prometheus-config-reloader=quay.io/coreos/prometheus-config-reloader:v0.29.0
         image: quay.io/coreos/prometheus-operator:PROMETHEUS_OPERATOR_VERSION
         name: prometheus-operator
         ports:
@@ -27,6 +31,10 @@ spec:
           requests:
             cpu: 100m
             memory: 100Mi
+      securityContext:
+        fsGroup: 2000
+        runAsNonRoot: true
+        runAsUser: 65534
       serviceAccountName: prometheus-operator
       nodeSelector:
         node_label_key: node_label_value

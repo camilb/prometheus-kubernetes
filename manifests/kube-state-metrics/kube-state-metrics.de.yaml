@@ -20,19 +20,14 @@ spec:
         ports:
         - name: http-metrics
           containerPort: 8080
+        - name: telemetry
+          containerPort: 8081
         readinessProbe:
           httpGet:
             path: /healthz
             port: 8080
           initialDelaySeconds: 5
           timeoutSeconds: 5
-        resources:
-          requests:
-            memory: 100Mi
-            cpu: 100m
-          limits:
-            memory: 200Mi
-            cpu: 200m
       - name: addon-resizer
         image: k8s.gcr.io/addon-resizer:1.7
         resources:
@@ -56,7 +51,7 @@ spec:
           - --container=kube-state-metrics
           - --cpu=100m
           - --extra-cpu=1m
-          - --memory=100Mi
+          - --memory=200Mi
           - --extra-memory=2Mi
           - --threshold=5
           - --deployment=kube-state-metrics

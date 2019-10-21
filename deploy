@@ -3,17 +3,18 @@
 #########################################################################################
 #components default version
 #########################################################################################
-GRAFANA_DEFAULT_VERSION=5.1.1
-PROMETHEUS_DEFAULT_VERSION=v2.2.1
-PROMETHEUS_OPERATOR_DEFAULT_VERSION=v0.19.0
+GRAFANA_DEFAULT_VERSION=6.0.2
+PROMETHEUS_DEFAULT_VERSION=v2.8.1
+PROMETHEUS_OPERATOR_DEFAULT_VERSION=v0.29.0
 PROMETHEUS_STORAGE_DEFAULT_RETENTION=168h
 PROMETHEUS_STORAGE_DEFAULT_VOLUME_SIZE=40Gi
 PROMETHEUS_DEFAULT_MEMORY_REQUEST=1Gi
-ALERTMANAGER_DEFAULT_VERSION=v0.15.0-rc.1
-NODE_EXPORTER_DEFAULT_VERSION=v0.16.0-rc.3
-KUBE_STATE_METRICS_DEFAULT_VERSION=v1.3.1
+ALERTMANAGER_DEFAULT_VERSION=v0.16.1
+NODE_EXPORTER_DEFAULT_VERSION=v0.17.0
+KUBE_STATE_METRICS_DEFAULT_VERSION=v1.5.0
 NODE_LABEL_DEFAULT_KEY=beta.kubernetes.io/monit
 NODE_LABEL_DEFAULT_VALUE=prometheus
+DEFAULT_NAMESPACE=monitoring
 
 #########################################################################################
 #external Urls for Prometheus and Alertmanager
@@ -36,10 +37,6 @@ if [ -z "${KUBECONFIG}" ]; then
     export KUBECONFIG=~/.kube/config
 fi
 
-if [ -z "${NAMESPACE}" ]; then
-    NAMESPACE=monitoring
-fi
-
 #check for uncommitted changes
 echo -e "${ORANGE}Check for uncommitted changes"
 echo
@@ -54,11 +51,18 @@ else
   tput sgr0
 fi
 
-echo
-echo -e "${BLUE}Creating ${ORANGE}'monitoring' ${BLUE}namespace."
+#Namespace
+read -p "Enter desired namespace to deploy prometheus [$DEFAULT_NAMESPACE]: " NAMESPACE
+NAMESPACE=${NAMESPACE:-$DEFAULT_NAMESPACE}
 tput sgr0
+
+echo -e "${BLUE}Creating ${ORANGE}${NAMESPACE} ${BLUE}namespace."
 kubectl create namespace "$NAMESPACE"
-echo
+
+#Set namespace in various resources
+for n in $(egrep -lir --include=*.{yaml,sh} "CUSTOM_NAMESPACE" .); do
+  sed -i -e 's,CUSTOM_NAMESPACE,'"$NAMESPACE"',g' $n
+done
 
 kctl() {
     kubectl --namespace "$NAMESPACE" "$@"
@@ -78,6 +82,7 @@ do
             STORAGE_CLASS_TYPE=gp2
             sed -i -e 's,STORAGE_CLASS_PROVISIONER,'"$STORAGE_CLASS_PROVISIONER"',g' manifests/prometheus/prometheus-k8s.yaml;
             sed -i -e 's,STORAGE_CLASS_TYPE,'"$STORAGE_CLASS_TYPE"',g' manifests/prometheus/prometheus-k8s.yaml;
+            sed -i -e 's,STORAGE_CLASS_TYPE,'"$STORAGE_CLASS_TYPE"',g' manifests/grafana/grafana.pvc.yaml;
             break
             ;;
         "GCP")
@@ -91,9 +96,7 @@ do
             if [[ $use_gke =~ ^([yY][eE][sS]|[yY])$ ]]; then
               echo "Grant cluster-admin permissions to your current identity"
               echo "Remove rules for self hosted clusters"
-              rm assets/prometheus/rules//kube-apiserver.rules
-              rm assets/prometheus/rules//kube-controller-manager.rules
-              rm assets/prometheus/rules//kube-scheduler.rules
+
               echo
               kubectl create clusterrolebinding admin-binding --clusterrole=cluster-admin --user=$(gcloud config get-value core/account)
             fi
@@ -110,9 +113,6 @@ do
             read -p "Y/N [N]: " use_aks
             if [[ $use_aks =~ ^([yY][eE][sS]|[yY])$ ]]; then
               echo "Remove rules for self hosted clusters"
-              rm assets/prometheus/rules//kube-apiserver.rules
-              rm assets/prometheus/rules//kube-controller-manager.rules
-              rm assets/prometheus/rules//kube-scheduler.rules
               echo
             fi
             sed -i -e 's,type,'kind',g' manifests/prometheus/prometheus-k8s.yaml;
@@ -122,8 +122,9 @@ do
             ;;
         "Custom")
             echo "Deploying on custom providers without persistence"
-            sed -i -e '1,10d;31,47d' manifests/prometheus/prometheus-k8s.yaml;
-            sed -i -e '1,12d;47,49d;91,93d' manifests/grafana/grafana.de.yaml;
+            sed -i -e '1,8d;32,45d' manifests/prometheus/prometheus-k8s.yaml;
+            rm -rf manifests/grafana/grafana.pvc.yaml
+            sed -i -e '31,34d;77,79d' manifests/grafana/grafana.de.yaml;
             break
             ;;
         *) echo invalid option;;
@@ -344,6 +345,7 @@ until kctl get customresourcedefinitions alertmanagers.monitoring.coreos.com > /
 until kctl get servicemonitors.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
 until kctl get prometheuses.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
 until kctl get alertmanagers.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
+until kctl get prometheusrules.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
 echo "done!"
 
 #alertmanager
@@ -371,38 +373,17 @@ echo
 echo -e "${ORANGE}Deploying Grafana"
 tput sgr0
 
-#grafana administrator username
-read -p "Enter Grafana administrator username [admin]: " GRAFANA_ADMIN_USERNAME
-GRAFANA_ADMIN_USERNAME=${GRAFANA_ADMIN_USERNAME:-admin}
-
-#grafana administrator password
-prompt="Enter Grafana administrator password: "
-while IFS= read -p "$prompt" -r -s -n 1 char
-do
-    if [[ $char == $'\0' ]]
-    then
-        break
-    fi
-    prompt='*'
-    grafana_admin_password+="$char"
-done
+kctl apply -f manifests/grafana
 
 echo
-
-#create grafana credentials secret
-kctl create secret generic grafana-credentials --from-literal=user=$GRAFANA_ADMIN_USERNAME --from-literal=password=$grafana_admin_password
-
-#generate grafana dashboards configmap
-(cd ./scripts; ./generate-dashboards-configmap.sh)
-
-kctl apply -f manifests/grafana
+echo -e "${ORANGE}Grafana default credentials"
+echo -e "${WHITE}user: ${ORANGE}admin, ${WHITE}password: ${ORANGE}admin"
+tput sgr0
 
 #prometheus
 echo
 echo -e "${ORANGE}Deploying Prometheus"
 tput sgr0
-#generate prometheus rules
-(cd ./scripts; ./generate-rules-configmap.sh)
 
 #deploy prometheus
 kubectl apply -f manifests/prometheus/prometheus-k8s-rbac.yaml

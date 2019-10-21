@@ -10,6 +10,8 @@ metadata:
 rules:
 - apiGroups: [""]
   resources:
+  - configmaps
+  - secrets
   - nodes
   - pods
   - services
@@ -52,7 +54,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: kube-state-metrics
-  namespace: monitoring
+  namespace: CUSTOM_NAMESPACE
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role

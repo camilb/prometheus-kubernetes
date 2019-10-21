@@ -24,7 +24,7 @@ The purpose of this project is to provide a simple and interactive method to dep
 ## Prerequisites
 
 * Kubernetes cluster and `kubectl` configured
-* Security Groups configured to allow the fallowing ports:
+* Security Groups configured to allow the following ports:
      * 9100/TCP  -                node-exporter
      * 10250/TCP -                kubernetes nodes metrics,
      * 10251/TCP -                kube-scheduler

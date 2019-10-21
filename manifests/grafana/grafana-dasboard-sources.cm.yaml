@@ -1,0 +1,17 @@
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+apiVersion: v1
+data:
+  dashboards.yaml: |-
+    [
+        {
+            "folder": "",
+            "name": "0",
+            "options": {
+                "path": "/grafana-dashboard-definitions/0"
+            },
+            "org_id": 1,
+            "type": "file"
+        }
+    ]
