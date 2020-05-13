@@ -35,6 +35,9 @@ The purpose of this project is to provide a simple and interactive method to dep
 * SMTP Account for email alerts
 * Token for Slack alerts
 
+#### Running Kubernetes 1.12 and up?
+If you are running Kubernetes 1.12 or higher you will also need to run [cAdvisor](https://github.com/google/cadvisor/tree/master/deploy/kubernetes) on your cluster (bound to host port 4194) in order to access resource usage and performance characteristics of running containers. 
+
 ## Pre-Deployment
 
 Clone the repository and checkout the latest release: `curl -L https://git.io/getPrometheusKubernetes | sh -`
