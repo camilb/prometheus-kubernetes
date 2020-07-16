@@ -13,7 +13,7 @@ spec:
     app: nginx-default-backend
 ---
 kind: Deployment
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 metadata:
   name: nginx-default-backend
   namespace: nginx-ingress
@@ -85,7 +85,7 @@ spec:
     targetPort: https
 ---
 kind: Deployment
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 metadata:
   name: ingress-nginx
   namespace: nginx-ingress
