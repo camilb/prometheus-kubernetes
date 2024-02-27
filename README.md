@@ -40,7 +40,9 @@ If you are running Kubernetes 1.12 or higher you will also need to run [cAdvisor
 
 ## Pre-Deployment
 
-Clone the repository and checkout the latest release: `curl -L https://git.io/getPrometheusKubernetes | sh -`
+Clone the repository and checkout the latest release: 
+
+    curl -L https://git.io/getPrometheusKubernetes | sh -
 
 
 ## Custom settings
